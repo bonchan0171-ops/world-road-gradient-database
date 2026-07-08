@@ -2,27 +2,33 @@ import rasterio
 
 
 class DEMLoader:
-    """DEM（GeoTIFF）を読み込むクラス"""
-
-    def __init__(self, filepath: str):
+    def __init__(self, filepath):
         self.filepath = filepath
+        self.dataset = None
+        self.dem = None
 
     def load(self):
-        """DEMファイルを読み込む"""
+        """DEMを読み込む"""
+        self.dataset = rasterio.open(self.filepath)
+        self.dem = self.dataset.read(1)
 
-        with rasterio.open(self.filepath) as dataset:
+        print("===== DEM Information =====")
+        print(f"File      : {self.filepath}")
+        print(f"Width     : {self.dataset.width}")
+        print(f"Height    : {self.dataset.height}")
+        print(f"CRS       : {self.dataset.crs}")
+        print(f"Resolution: {self.dataset.res}")
+        print(f"NoData    : {self.dataset.nodata}")
+        print(f"Bounds    : {self.dataset.bounds}")
+        print(f"Minimum Elevation : {self.dem.min()}")
+        print(f"Maximum Elevation : {self.dem.max()}")
 
-            print("===== DEM Information =====")
-            print(f"File      : {self.filepath}")
-            print(f"Width     : {dataset.width}")
-            print(f"Height    : {dataset.height}")
-            print(f"CRS       : {dataset.crs}")
-            print(f"Resolution: {dataset.res}")
-            print(f"NoData    : {dataset.nodata}")
+        return self.dem
 
-            dem = dataset.read(1)
+    def get_elevation(self, lat, lon):
+        """
+        緯度・経度から標高を取得
+        """
+        row, col = self.dataset.index(lon, lat)
 
-            print(f"Minimum Elevation : {dem.min()}")
-            print(f"Maximum Elevation : {dem.max()}")
-
-            return dem
+        return self.dem[row, col]

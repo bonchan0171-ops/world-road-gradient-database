@@ -7,9 +7,18 @@ def main():
 
     loader = DEMLoader(filepath)
 
-    dem = loader.load()
+    loader.load()
 
-    print(dem)
+    lat = 35.7700
+    lon = 139.7250
+
+    elevation = loader.get_elevation(lat, lon)
+
+    print()
+    print("===== Elevation =====")
+    print(f"Latitude : {lat}")
+    print(f"Longitude: {lon}")
+    print(f"Elevation: {elevation:.2f} m")
 
 
 if __name__ == "__main__":
