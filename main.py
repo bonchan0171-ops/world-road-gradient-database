@@ -3,7 +3,7 @@ from src.io.dem_loader import DEMLoader
 
 def main():
 
-    filepath = "data/raw/sample.tif"
+    filepath = "data/raw/output_hh.tif"
 
     loader = DEMLoader(filepath)
 
