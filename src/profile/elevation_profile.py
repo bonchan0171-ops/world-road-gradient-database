@@ -47,7 +47,7 @@ class ElevationProfile:
             total += distance
             cumulative.append(total)
 
-        return cumulative     
+        return cumulative
 
     def max_elevation(self) -> float:
         """
@@ -118,4 +118,4 @@ class ElevationProfile:
             if current < previous:
                 descent += previous - current
 
-        return descent        
+        return descent

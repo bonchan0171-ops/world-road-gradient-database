@@ -1,4 +1,5 @@
 import pytest
+
 from src.io.dem_loader import DEMLoader
 
 
@@ -13,7 +14,7 @@ def test_load_dem():
     assert dem.shape[0] > 0
     assert dem.shape[1] > 0
 
-    
+
 def test_get_elevation():
     """標高が取得できることを確認"""
 
@@ -23,7 +24,7 @@ def test_get_elevation():
     elevation = loader.get_elevation(35.7700, 139.7250)
 
     assert isinstance(elevation, float)
-        
+
 
 def test_out_of_bounds():
     """範囲外座標ではValueErrorになることを確認"""
@@ -32,4 +33,4 @@ def test_out_of_bounds():
     loader.load()
 
     with pytest.raises(ValueError):
-        loader.get_elevation(35.681236, 139.767125)    
+        loader.get_elevation(35.681236, 139.767125)

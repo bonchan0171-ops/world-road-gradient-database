@@ -66,9 +66,7 @@ class RoadSegmentBuilder:
             If fewer than two coordinates are provided.
         """
         if len(coordinates) < 2:
-            raise ValueError(
-                "At least two coordinates are required."
-            )
+            raise ValueError("At least two coordinates are required.")
 
     def _get_elevations(
         self,
@@ -77,10 +75,7 @@ class RoadSegmentBuilder:
         """
         Retrieve elevations for all coordinates.
         """
-        return [
-            self._dem_loader.get_elevation(lat, lon)
-            for lat, lon in coordinates
-        ]
+        return [self._dem_loader.get_elevation(lat, lon) for lat, lon in coordinates]
 
     def _calculate_distances(
         self,

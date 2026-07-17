@@ -46,6 +46,21 @@ The `ElevationProfile` class provides elevation analysis for a `RoadSegment`.
 - Total ascent
 - Total descent
 
+# Quality Assurance
+
+WRGD follows modern Python OSS development practices.
+
+- ✅ Ruff (Lint)
+- ✅ Black (Code Formatter)
+- ✅ mypy (Static Type Checking)
+- ✅ pytest (Unit Testing)
+- ✅ pytest-cov (Coverage)
+- ✅ GitHub Actions (Continuous Integration)
+
+Current test coverage:
+
+- **98%**
+
 ### Example
 
 ```python
@@ -77,34 +92,57 @@ RoadSegment
 
 Project responsibilities are clearly separated.
 
-| Module   | Responsibility            |
-| -------- | ------------------------- |
-| geometry | Mathematical calculations |
-| io       | DEM access                |
-| road     | Road domain model         |
-| builder  | Object construction       |
+| Package       | Responsibility                     |
+| ------------- | ---------------------------------- |
+| geometry      | Mathematical calculations          |
+| io            | DEM loading                        |
+| road          | RoadSegment and RoadSegmentBuilder |
+| profile       | Elevation profile analysis         |
+| preprocessing | Data preprocessing                 |
+| utils         | Utility functions                  |
+
 
 ---
+
+# API Overview
+
+| Package | Description |
+|---------|-------------|
+| io | DEM loading |
+| geometry | Distance and gradient calculations |
+| road | RoadSegment and Builder |
+| profile | Elevation profile analysis |
+| preprocessing | Data preprocessing |
+| utils | Utility functions |
 
 # Project Structure
 
 ```text
 world-road-gradient-database/
 
+├── .github/
+│   └── workflows/
+│
 ├── docs/
 ├── data/
+│
 ├── src/
 │   ├── geometry/
 │   ├── io/
+│   ├── profile/
 │   ├── preprocessing/
 │   ├── road/
 │   └── utils/
 │
 ├── tests/
 │
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
 ├── requirements.txt
-├── pytest.ini
-└── README.md
+├── pyproject.toml
+└── pytest.ini
 ```
 
 ---
@@ -112,7 +150,7 @@ world-road-gradient-database/
 # Installation
 
 ```bash
-git clone https://github.com/<your-github-account>/world-road-gradient-database.git
+git clone https://github.com/bonchan0171-ops/world-road-gradient-database.git
 
 cd world-road-gradient-database
 
@@ -121,7 +159,15 @@ pip install -r requirements.txt
 
 ---
 
-# Running Tests
+# Quick Start
+
+Run quality checks
+
+```bash
+ruff check .
+black --check .
+mypy src
+```
 
 Run all tests
 
@@ -129,10 +175,10 @@ Run all tests
 pytest
 ```
 
-Run only Builder tests
+Run tests with coverage
 
 ```bash
-pytest tests/test_builder.py -v
+pytest --cov=src --cov-report=term-missing
 ```
 
 ---
@@ -147,13 +193,30 @@ pytest tests/test_builder.py -v
 | Sprint 3 | ✅ Distance & Gradient |
 | Sprint 4 | ✅ RoadSegment         |
 | Sprint 5 | ✅ RoadSegmentBuilder  |
-| Sprint 6 | 🚧 Elevation Profile  |
-| Sprint 7 | Planned               |
-| Sprint 8 | Planned               |
+| Sprint 6 | ✅ Elevation Profile |
+| Sprint 7 | ✅ OSS Quality Improvements |
+| Sprint 8 | Planned |
 
 ---
 
 # Version History
+
+## v0.8.0
+
+* Added Ruff
+* Added Black
+* Added mypy
+* Added pytest-cov
+* Improved GitHub Actions
+* Added CHANGELOG.md
+
+## v0.7.0
+
+* Added ElevationProfile
+* Added cumulative distance calculation
+* Added ascent/descent analysis
+* Added CONTRIBUTING.md
+* Added MIT License
 
 ## v0.6.0
 
@@ -208,9 +271,10 @@ Planned features include:
 * GPX support
 * GeoJSON support
 * OpenStreetMap integration
-* Elevation profile generation
-* Visualization
+* Interactive maps
 * Routing engine integration
+* REST API
+* PyPI release
 * Global road geometry database
 
 ---
@@ -218,3 +282,9 @@ Planned features include:
 # License
 
 This project is released under the MIT License.
+
+# Contributing
+
+Contributions are welcome!
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting issues or pull requests.

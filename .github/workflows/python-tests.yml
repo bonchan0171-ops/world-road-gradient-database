@@ -4,16 +4,19 @@ on:
   push:
     branches:
       - main
+      - master
+
   pull_request:
     branches:
       - main
+      - master
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up Python
@@ -26,6 +29,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run pytest
-        run: |
-          pytest
+      - name: Ruff
+        run: ruff check .
+
+      - name: Black
+        run: black --check .
+
+      - name: mypy
+        run: mypy src
+
+      - name: Run Tests with Coverage
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=95

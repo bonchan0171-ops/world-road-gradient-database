@@ -24,21 +24,15 @@ class RoadSegment:
         point_count = len(self.coordinates)
 
         if point_count != len(self.elevations):
-            raise ValueError(
-                "coordinates and elevations must have the same length."
-            )
+            raise ValueError("coordinates and elevations must have the same length.")
 
         expected_segments = max(0, point_count - 1)
 
         if len(self.distances) != expected_segments:
-            raise ValueError(
-                f"distances must contain {expected_segments} elements."
-            )
+            raise ValueError(f"distances must contain {expected_segments} elements.")
 
         if len(self.gradients) != expected_segments:
-            raise ValueError(
-                f"gradients must contain {expected_segments} elements."
-            )
+            raise ValueError(f"gradients must contain {expected_segments} elements.")
 
     def point_count(self) -> int:
         """Return the number of coordinate points."""

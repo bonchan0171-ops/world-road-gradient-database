@@ -25,7 +25,7 @@ class DEMLoader:
 
         return self.dem
 
-    def get_elevation(self, lat, lon):
+    def get_elevation(self, lat: float, lon: float) -> float:
         """
         緯度・経度から標高を取得する
 
@@ -42,17 +42,21 @@ class DEMLoader:
             標高（m）
         """
 
+        # DEMが読み込まれていることを確認
+        if self.dataset is None or self.dem is None:
+            raise RuntimeError("DEM is not loaded.")
+
+        # mypyに「ここから先はNoneではない」と伝える
+        assert self.dataset is not None
+        assert self.dem is not None
+
         row, col = self.dataset.index(lon, lat)
 
         # DEM範囲外チェック
         if row < 0 or row >= self.dataset.height:
-            raise ValueError(
-                f"Latitude {lat} is outside the DEM coverage."
-            )
+            raise ValueError(f"Latitude {lat} is outside the DEM coverage.")
 
         if col < 0 or col >= self.dataset.width:
-            raise ValueError(
-                f"Longitude {lon} is outside the DEM coverage."
-            )
+            raise ValueError(f"Longitude {lon} is outside the DEM coverage.")
 
         return float(self.dem[row, col])
