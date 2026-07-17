@@ -29,7 +29,34 @@ Current features include:
 * ✅ Road gradient calculation
 * ✅ RoadSegment data model
 * ✅ RoadSegmentBuilder
+* ✅ ElevationProfile analysis
 * ✅ Unit tests with pytest
+* ✅ Continuous Integration with GitHub Actions
+
+## ElevationProfile
+
+The `ElevationProfile` class provides elevation analysis for a `RoadSegment`.
+
+### Features
+
+- Cumulative distance calculation
+- Elevation profile
+- Maximum elevation
+- Minimum elevation
+- Total ascent
+- Total descent
+
+### Example
+
+```python
+from src.profile import ElevationProfile
+
+profile = ElevationProfile(segment)
+
+print(profile.max_elevation())
+print(profile.total_ascent())
+print(profile.cumulative_distances())
+```
 
 ---
 
