@@ -16,6 +16,14 @@ class GeoJSONReader:
     """
 
     def __init__(self, filepath: str | Path) -> None:
+        """
+        Initialize the GeoJSON reader.
+
+        Parameters
+        ----------
+        filepath : str | Path
+            Path to the GeoJSON file.
+        """
         self.filepath = Path(filepath)
 
     def read(self) -> list[Coordinate]:
@@ -25,18 +33,23 @@ class GeoJSONReader:
         Returns
         -------
         list[Coordinate]
-            Coordinates extracted from the LineString.
+            A list of geographic coordinates extracted from the first
+            LineString feature.
 
         Raises
         ------
         FileNotFoundError
-            If the file does not exist.
+            If the GeoJSON file does not exist.
         ValueError
-            If the GeoJSON format is invalid.
+            If the GeoJSON structure is invalid or does not contain a
+            supported LineString geometry.
         """
 
-        with self.filepath.open("r", encoding="utf-8") as f:
-            data = json.load(f)
+        try:
+            with self.filepath.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+        except json.JSONDecodeError as e:
+            raise ValueError("Invalid GeoJSON file.") from e
 
         if data.get("type") != "FeatureCollection":
             raise ValueError("GeoJSON must be a FeatureCollection.")
@@ -46,7 +59,9 @@ class GeoJSONReader:
         if not features:
             raise ValueError("No features found.")
 
-        geometry = features[0].get("geometry")
+        feature = features[0]
+
+        geometry = feature.get("geometry")
 
         if geometry is None:
             raise ValueError("Geometry not found.")
@@ -56,7 +71,22 @@ class GeoJSONReader:
 
         coordinates = geometry.get("coordinates", [])
 
-        return [
-            Coordinate(latitude=lat, longitude=lon)
-            for lon, lat in coordinates
-        ]
+        if not coordinates:
+            raise ValueError("LineString contains no coordinates.")
+
+        result: list[Coordinate] = []
+
+        for coordinate in coordinates:
+            if len(coordinate) < 2:
+                raise ValueError("Invalid coordinate.")
+
+            lon, lat = coordinate[:2]
+
+            result.append(
+                Coordinate(
+                    latitude=lat,
+                    longitude=lon,
+                )
+            )
+
+        return result
