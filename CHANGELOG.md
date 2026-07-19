@@ -9,13 +9,48 @@ This project follows Semantic Versioning.
 
 ## [Unreleased]
 
-### Added
-
-- Work in progress for Sprint 7
+No unreleased changes.
 
 ---
 
-## [v0.7.0] - Sprint 6
+## [v0.9.0] - 2026-07-20
+
+### Added
+
+- GeoJSONReader
+- GeoJSONWriter
+- GPXReader
+- GeoJSON unit tests
+- GPX unit tests
+
+### Improved
+
+- README
+- API Overview
+
+---
+
+## [v0.8.0] - 2026-07-17
+
+### Added
+
+- Ruff
+- Black
+- mypy
+- pytest-cov
+- CHANGELOG.md
+
+### CI
+
+- Improved GitHub Actions
+
+### Documentation
+
+- README improvements
+
+---
+
+## [v0.7.0] - 2026-07-13
 
 ### Added
 
@@ -37,7 +72,7 @@ This project follows Semantic Versioning.
 
 ---
 
-## [v0.6.0] - Sprint 5
+## [v0.6.0] - 2026-07-12
 
 ### Added
 

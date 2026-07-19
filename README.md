@@ -34,6 +34,7 @@ Current features include:
 * ✅ Continuous Integration with GitHub Actions
 * ✅ GeoJSON LineString reader
 * ✅ GeoJSON FeatureCollection writer
+* ✅ GPX Track reader
 
 ## ElevationProfile
 
@@ -80,10 +81,10 @@ print(profile.cumulative_distances())
 # Architecture
 
 ```text
-GeoJSON
-      │
-      ▼
-GeoJSONReader
+GeoJSON / GPX
+        │
+        ▼
+GeoJSONReader / GPXReader
       │
       ▼
 Coordinates
@@ -226,6 +227,21 @@ pytest --cov=src --cov-report=term-missing
 
 # Version History
 
+## Unreleased (Sprint 8)
+
+### Added
+
+- GeoJSONReader
+- GeoJSONWriter
+- GPXReader
+- GeoJSON unit tests
+- GPX unit tests
+
+### Improved
+
+- README
+- API Overview
+
 ## v0.8.0
 
 * Added Ruff
@@ -293,10 +309,11 @@ Development rules:
 
 Planned features include:
 
-* GPX support
-* OpenStreetMap integration
-* REST API
-* PyPI release
+- GPX Writer
+- OpenStreetMap integration
+- KML support
+- REST API
+- PyPI release
 
 ---
 
@@ -317,10 +334,10 @@ WRGD does not include DEM datasets.
 
 Supported DEM datasets include:
 
-- AW3D30
-- SRTM
-- Copernicus DEM
-- FABDEM
+- AW3D30 (GeoTIFF)
+- SRTM (GeoTIFF)
+- Copernicus DEM (GeoTIFF)
+- FABDEM (GeoTIFF)
 
 Please download the datasets separately before using WRGD.
 
@@ -333,3 +350,6 @@ It is designed to be lightweight, extensible, and easy to integrate into Python 
 It provides reusable building blocks for elevation,
 gradient and terrain analysis from DEM datasets.
 The project aims to become a reusable foundation for road geometry analysis across multiple GIS data sources.
+WRGD is designed with a modular architecture,
+making it easy to add support for additional GIS
+data formats such as OpenStreetMap and KML in the future.
