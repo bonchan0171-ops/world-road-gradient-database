@@ -32,6 +32,8 @@ Current features include:
 * ✅ ElevationProfile analysis
 * ✅ Unit tests with pytest
 * ✅ Continuous Integration with GitHub Actions
+* ✅ GeoJSON LineString reader
+* ✅ GeoJSON FeatureCollection writer
 
 ## ElevationProfile
 
@@ -78,6 +80,12 @@ print(profile.cumulative_distances())
 # Architecture
 
 ```text
+GeoJSON
+      │
+      ▼
+GeoJSONReader
+      │
+      ▼
 Coordinates
       │
       ▼
@@ -88,18 +96,24 @@ RoadSegmentBuilder
       ├── calculate_gradient()
       ▼
 RoadSegment
+      │
+      ▼
+ElevationProfile
+      │
+      ▼
+GeoJSONWriter
 ```
 
 Project responsibilities are clearly separated.
 
-| Package       | Responsibility                     |
-| ------------- | ---------------------------------- |
-| geometry      | Mathematical calculations          |
-| io            | DEM loading                        |
-| road          | RoadSegment and RoadSegmentBuilder |
-| profile       | Elevation profile analysis         |
-| preprocessing | Data preprocessing                 |
-| utils         | Utility functions                  |
+| Package | Responsibility |
+|----------|----------------|
+| geometry | Mathematical calculations |
+| io | DEM, GeoJSON and GPX I/O |
+| road | RoadSegment and RoadSegmentBuilder |
+| profile | Elevation profile analysis |
+| preprocessing | Data preprocessing |
+| utils | Utility functions |
 
 
 ---
@@ -108,7 +122,7 @@ Project responsibilities are clearly separated.
 
 | Package | Description |
 |---------|-------------|
-| io | DEM loading |
+| io | DEM, GeoJSON and GPX I/O |
 | geometry | Distance and gradient calculations |
 | road | RoadSegment and Builder |
 | profile | Elevation profile analysis |
@@ -129,6 +143,7 @@ world-road-gradient-database/
 ├── src/
 │   ├── geometry/
 │   ├── io/
+│   ├── models/ 
 │   ├── profile/
 │   ├── preprocessing/
 │   ├── road/
@@ -161,7 +176,17 @@ pip install -r requirements.txt
 
 # Quick Start
 
-Run quality checks
+```python
+from src.io.geojson_reader import GeoJSONReader
+
+reader = GeoJSONReader("road.geojson")
+
+coordinates = reader.read()
+
+print(f"Loaded {len(coordinates)} coordinates.")
+```
+
+## Run Quality Checks
 
 ```bash
 ruff check .
@@ -169,13 +194,13 @@ black --check .
 mypy src
 ```
 
-Run all tests
+## Run Tests
 
 ```bash
 pytest
 ```
 
-Run tests with coverage
+## Run Tests with Coverage
 
 ```bash
 pytest --cov=src --cov-report=term-missing
@@ -195,7 +220,7 @@ pytest --cov=src --cov-report=term-missing
 | Sprint 5 | ✅ RoadSegmentBuilder  |
 | Sprint 6 | ✅ Elevation Profile |
 | Sprint 7 | ✅ OSS Quality Improvements |
-| Sprint 8 | Planned |
+| Sprint 8 | 🚧 In Progress |
 
 ---
 
@@ -269,13 +294,9 @@ Development rules:
 Planned features include:
 
 * GPX support
-* GeoJSON support
 * OpenStreetMap integration
-* Interactive maps
-* Routing engine integration
 * REST API
 * PyPI release
-* Global road geometry database
 
 ---
 
@@ -288,3 +309,27 @@ This project is released under the MIT License.
 Contributions are welcome!
 
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting issues or pull requests.
+
+
+# Data
+
+WRGD does not include DEM datasets.
+
+Supported DEM datasets include:
+
+- AW3D30
+- SRTM
+- Copernicus DEM
+- FABDEM
+
+Please download the datasets separately before using WRGD.
+
+# Why WRGD?
+
+Unlike general GIS libraries,
+WRGD focuses specifically on road geometry analysis.
+It is designed to be lightweight, extensible, and easy to integrate into Python applications.
+
+It provides reusable building blocks for elevation,
+gradient and terrain analysis from DEM datasets.
+The project aims to become a reusable foundation for road geometry analysis across multiple GIS data sources.
