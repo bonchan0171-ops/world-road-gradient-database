@@ -6,7 +6,7 @@ from src.io.dem_loader import DEMLoader
 def test_load_dem():
     """DEMが正常に読み込めることを確認"""
 
-    loader = DEMLoader("data/raw/output_hh.tif")
+    loader = DEMLoader("tests/data/sample_dem.tif")
 
     dem = loader.load()
 
@@ -18,7 +18,7 @@ def test_load_dem():
 def test_get_elevation():
     """標高が取得できることを確認"""
 
-    loader = DEMLoader("data/raw/output_hh.tif")
+    loader = DEMLoader("tests/data/sample_dem.tif")
     loader.load()
 
     elevation = loader.get_elevation(35.7700, 139.7250)
@@ -29,7 +29,7 @@ def test_get_elevation():
 def test_out_of_bounds():
     """範囲外座標ではValueErrorになることを確認"""
 
-    loader = DEMLoader("data/raw/output_hh.tif")
+    loader = DEMLoader("tests/data/sample_dem.tif")
     loader.load()
 
     with pytest.raises(ValueError):
