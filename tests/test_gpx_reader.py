@@ -53,6 +53,7 @@ def test_invalid_xml(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         reader.read()
 
+
 def test_track_not_found(tmp_path: Path) -> None:
     filepath = tmp_path / "no_track.gpx"
 
@@ -68,6 +69,7 @@ def test_track_not_found(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError):
         reader.read()
+
 
 def test_tracksegment_not_found(tmp_path: Path) -> None:
     filepath = tmp_path / "no_segment.gpx"
@@ -105,6 +107,4 @@ def test_trackpoint_not_found(tmp_path: Path) -> None:
     reader = GPXReader(filepath)
 
     with pytest.raises(ValueError):
-        reader.read()                
-
-
+        reader.read()

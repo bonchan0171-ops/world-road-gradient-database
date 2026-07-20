@@ -43,4 +43,4 @@ def test_write_empty_coordinates(tmp_path: Path) -> None:
         ValueError,
         match="Coordinate list is empty.",
     ):
-        writer.write([])    
+        writer.write([])

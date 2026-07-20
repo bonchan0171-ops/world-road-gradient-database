@@ -49,9 +49,7 @@ class GPXReader:
 
         root = tree.getroot()
 
-        namespace = {
-            "gpx": "http://www.topografix.com/GPX/1/1"
-        }
+        namespace = {"gpx": "http://www.topografix.com/GPX/1/1"}
 
         track = root.find("gpx:trk", namespace)
 

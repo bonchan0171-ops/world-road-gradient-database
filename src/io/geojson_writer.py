@@ -54,8 +54,7 @@ class GeoJSONWriter:
                     "geometry": {
                         "type": "LineString",
                         "coordinates": [
-                            [coord.longitude, coord.latitude]
-                            for coord in coordinates
+                            [coord.longitude, coord.latitude] for coord in coordinates
                         ],
                     },
                     "properties": {},
