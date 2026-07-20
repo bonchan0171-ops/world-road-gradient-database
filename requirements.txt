@@ -1,5 +1,5 @@
 numpy
-rasteriogit commit
+rasterio
 matplotlib
 pytest
 ruff
