@@ -36,8 +36,8 @@ No unreleased changes.
 
 ### Known Issues
 
-- NumPy 2.5.x may emit a DeprecationWarning from the Rasterio dependency when loading DEM files.
-- This warning does not affect WRGD functionality.
+- When using NumPy 2.5.x, a `DeprecationWarning` may be emitted by the Rasterio dependency when loading DEM files.
+- This warning originates from Rasterio, not WRGD, and does not affect functionality.
 
 ---
 
