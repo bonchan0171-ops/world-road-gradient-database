@@ -13,6 +13,34 @@ No unreleased changes.
 
 ---
 
+## [v0.10.0] - 2026-07-22
+
+### Added
+
+- GPXWriter implementation
+- GPX 1.1 export support
+- GPXWriter unit tests
+
+### Improved
+
+- README updated
+- Architecture diagram updated
+- Supported formats table added
+
+### Quality
+
+- 39 pytest tests passed
+- Ruff passed
+- Black passed
+- mypy passed
+
+### Known Issues
+
+- NumPy 2.5.x may emit a DeprecationWarning from the Rasterio dependency when loading DEM files.
+- This warning does not affect WRGD functionality.
+
+---
+
 ## [v0.9.0] - 2026-07-20
 
 ### Added

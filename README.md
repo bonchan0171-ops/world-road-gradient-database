@@ -35,6 +35,7 @@ Current features include:
 * ✅ GeoJSON LineString reader
 * ✅ GeoJSON FeatureCollection writer
 * ✅ GPX Track reader
+* ✅ GPX Track writer
 
 ## ElevationProfile
 
@@ -81,28 +82,28 @@ print(profile.cumulative_distances())
 # Architecture
 
 ```text
-GeoJSON / GPX
-        │
-        ▼
-GeoJSONReader / GPXReader
-      │
-      ▼
-Coordinates
-      │
-      ▼
-RoadSegmentBuilder
-      │
-      ├── DEMLoader
-      ├── calculate_distance()
-      ├── calculate_gradient()
-      ▼
-RoadSegment
-      │
-      ▼
-ElevationProfile
-      │
-      ▼
-GeoJSONWriter
+                 GeoJSON / GPX
+                      │
+          ┌───────────┴───────────┐
+          ▼                       ▼
+      GeoJSONReader          GPXReader
+          │                       │
+          └───────────┬───────────┘
+                      ▼
+                 Coordinates
+                      │
+                      ▼
+             RoadSegmentBuilder
+                      │
+                      ▼
+                RoadSegment
+                      │
+                      ▼
+             ElevationProfile
+                      │
+          ┌───────────┴───────────┐
+          ▼                       ▼
+      GeoJSONWriter          GPXWriter
 ```
 
 Project responsibilities are clearly separated.
@@ -118,6 +119,16 @@ Project responsibilities are clearly separated.
 
 
 ---
+
+## Supported Formats
+
+| Format | Read | Write |
+|--------|:----:|:-----:|
+| GeoJSON | ✅ | ✅ |
+| GPX | ✅ | ✅ |
+| KML | ❌ | ❌ |
+| OpenStreetMap (OSM) | ❌ | ❌ |
+
 
 # API Overview
 
