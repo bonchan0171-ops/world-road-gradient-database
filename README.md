@@ -36,6 +36,7 @@ Current features include:
 * ✅ GeoJSON FeatureCollection writer
 * ✅ GPX Track reader
 * ✅ GPX Track writer
+* ✅ GPX elevation (`<ele>`) support
 
 ## ElevationProfile
 
@@ -198,6 +199,28 @@ coordinates = reader.read()
 print(f"Loaded {len(coordinates)} coordinates.")
 ```
 
+## GPX Writer Example
+
+```python
+from src.io.gpx_writer import GPXWriter
+
+points = [
+    (35.681236, 139.767125, 12.3),
+    (35.682000, 139.768000, 15.8),
+]
+
+writer = GPXWriter()
+writer.write(points, "route.gpx")
+```
+
+Generated GPX:
+
+```xml
+<trkpt lat="35.681236" lon="139.767125">
+    <ele>12.3</ele>
+</trkpt>
+```
+
 ## Run Quality Checks
 
 ```bash
@@ -232,26 +255,24 @@ pytest --cov=src --cov-report=term-missing
 | Sprint 5 | ✅ RoadSegmentBuilder  |
 | Sprint 6 | ✅ Elevation Profile |
 | Sprint 7 | ✅ OSS Quality Improvements |
-| Sprint 8 | 🚧 In Progress |
-
+| Sprint 8  | ✅ GeoJSON / GPX Reader & Writer |
+| Sprint 9  | ✅ GPX I/O Completed |
+| Sprint 10 | ✅ GPX Elevation Support |
 ---
 
 # Version History
 
-## Unreleased (Sprint 8)
+## v0.11.0
 
 ### Added
 
-- GeoJSONReader
-- GeoJSONWriter
-- GPXReader
-- GeoJSON unit tests
-- GPX unit tests
+- GPX elevation (`<ele>`) support
+- Backward-compatible GPXWriter
 
 ### Improved
 
-- README
-- API Overview
+- GPXWriter documentation
+- README examples
 
 ## v0.8.0
 

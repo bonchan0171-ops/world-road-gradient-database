@@ -13,7 +13,30 @@ No unreleased changes.
 
 ---
 
+## [v0.11.0] - 2026-07-22
+
+### Added
+
+- GPX elevation (`<ele>`) output support
+- Backward-compatible GPXWriter
+- Unit tests for GPX elevation support
+- Validation for invalid point formats
+
+### Improved
+
+- README updated with GPX elevation examples
+
+### Quality
+
+- 42 pytest tests passed
+- Ruff passed
+- Black passed
+- mypy passed
+
+---
+
 ## [v0.10.0] - 2026-07-22
+...
 
 ### Added
 
