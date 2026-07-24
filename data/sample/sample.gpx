@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1"
+     creator="WRGD"
+     xmlns="http://www.topografix.com/GPX/1/1">
+
+  <trk>
+    <name>WRGD Sample Route</name>
+
+    <trkseg>
+
+      <trkpt lat="35.770000" lon="139.720000"/>
+      <trkpt lat="35.770500" lon="139.721000"/>
+      <trkpt lat="35.771000" lon="139.722000"/>
+      <trkpt lat="35.771500" lon="139.723000"/>
+      <trkpt lat="35.772000" lon="139.724000"/>
+
+    </trkseg>
+  </trk>
+
+</gpx>

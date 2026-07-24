@@ -46,12 +46,51 @@ class RoadSegment:
         """Return the total distance in meters."""
         return sum(self.distances)
 
-    def average_gradient(self) -> float:
-        """Return the average gradient (%).
+        return sum(self.gradients) / len(self.gradients)
 
-        Returns:
-            Average gradient. Returns 0.0 if there are no segments.
-        """
+    def max_gradient(self) -> float:
+        """Return the maximum gradient (%)."""
+        if not self.gradients:
+            return 0.0
+
+        return max(self.gradients)
+
+    def highest_elevation(self) -> float:
+        """Return the highest elevation (m)."""
+        if not self.elevations:
+            return 0.0
+
+        return max(self.elevations)
+
+    def lowest_elevation(self) -> float:
+        """Return the lowest elevation (m)."""
+        if not self.elevations:
+            return 0.0
+
+        return min(self.elevations)
+
+    def total_ascent(self) -> float:
+        """Return the total ascent (m)."""
+        return sum(
+            max(0.0, current - previous)
+            for previous, current in zip(
+                self.elevations[:-1],
+                self.elevations[1:],
+            )
+        )
+
+    def total_descent(self) -> float:
+        """Return the total descent (m)."""
+        return sum(
+            max(0.0, previous - current)
+            for previous, current in zip(
+                self.elevations[:-1],
+                self.elevations[1:],
+            )
+        )
+
+    def average_gradient(self) -> float:
+        """Return the average gradient (%)."""
         if not self.gradients:
             return 0.0
 
