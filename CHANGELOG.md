@@ -13,6 +13,52 @@ No unreleased changes.
 
 ---
 
+## [v0.13.0] - 2026-07-26
+
+### Added
+
+- Command Line Interface (CLI)
+- Shared application utilities (`src/app.py`)
+- Elevation profile visualization
+- Demo application improvements
+
+### Improved
+
+- Refactored demo and CLI to share common logic
+- Improved project structure and maintainability
+
+### Quality
+
+- 42 pytest tests passed
+- Ruff passed
+- Black passed
+- mypy passed
+
+---
+
+## [v0.12.0] - 2026-07-26
+
+### Added
+
+- Demo application (`examples/demo.py`)
+- Road analysis report
+- Elevation profile visualization
+- PNG export (`output/elevation_profile.png`)
+
+### Improved
+
+- README updated with demo instructions
+- Demo screenshots and usage examples
+
+### Quality
+
+- 42 pytest tests passed
+- Ruff passed
+- Black passed
+- mypy passed
+
+---
+
 ## [v0.11.0] - 2026-07-22
 
 ### Added

@@ -1,5 +1,8 @@
 # World Road Geometry Database (WRGD)
 
+![Python](https://img.shields.io/badge/python-3.12-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 A Python open-source library for analyzing road geometry from Digital Elevation Models (DEM).
 
 WRGD combines DEM data with geographic coordinates to calculate:
@@ -42,14 +45,72 @@ Current features include:
 
 The `ElevationProfile` class provides elevation analysis for a `RoadSegment`.
 
-### Features
+## Current Capabilities
 
-- Cumulative distance calculation
-- Elevation profile
-- Maximum elevation
-- Minimum elevation
-- Total ascent
-- Total descent
+- DEM (GeoTIFF) loading
+- Elevation lookup
+- Distance calculation
+- Gradient calculation
+- RoadSegment model
+- ElevationProfile analysis
+- GeoJSON Read / Write
+- GPX Read / Write
+- GPX elevation (`<ele>`) support
+- Demo application
+- Elevation profile visualization
+- Command Line Interface (CLI)
+
+## Demo
+
+Run the demonstration application:
+
+```bash
+python -m examples.demo
+```
+
+Example output:
+
+```text
+========================================
+ Road Analysis Report
+========================================
+
+Distance           :    423.9 m
+Total Ascent       :      3.0 m
+Total Descent      :      1.3 m
+
+Highest Elevation  :     11.7 m
+Lowest Elevation   :      8.7 m
+
+Max Gradient       :     1.45 %
+Average Gradient   :     0.41 %
+```
+
+The demo also generates an elevation profile image:
+
+```text
+output/elevation_profile.png
+```
+
+## Command Line Interface
+
+WRGD includes a simple command-line interface.
+
+Example:
+
+```bash
+python -m src.cli \
+    --route data/sample/sample.gpx \
+    --dem data/raw/output_hh.tif
+```
+
+Example output:
+
+```text
+WRGD CLI
+Route : data/sample/sample.gpx
+DEM   : data/raw/output_hh.tif
+```
 
 # Quality Assurance
 
@@ -153,14 +214,23 @@ world-road-gradient-database/
 ├── docs/
 ├── data/
 │
+├── examples/
+│   ├── __init__.py
+│   └── demo.py
+│
+├── output/
+│   └── elevation_profile.png   # 実行時に生成
+│
 ├── src/
 │   ├── geometry/
 │   ├── io/
-│   ├── models/ 
-│   ├── profile/
+│   ├── models/
 │   ├── preprocessing/
+│   ├── profile/
 │   ├── road/
-│   └── utils/
+│   ├── utils/
+│   ├── app.py                  # 共通アプリケーション処理
+│   └── cli.py                  # CLI
 │
 ├── tests/
 │
@@ -182,7 +252,7 @@ git clone https://github.com/bonchan0171-ops/world-road-gradient-database.git
 
 cd world-road-gradient-database
 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ---
@@ -258,9 +328,34 @@ pytest --cov=src --cov-report=term-missing
 | Sprint 8  | ✅ GeoJSON / GPX Reader & Writer |
 | Sprint 9  | ✅ GPX I/O Completed |
 | Sprint 10 | ✅ GPX Elevation Support |
+| Sprint 11 | ✅ Demo Application |
+| Sprint 12 | ✅ CLI & Application Refactoring |
 ---
 
 # Version History
+
+## v0.13.0
+
+### Added
+
+- Command Line Interface (CLI)
+- Shared application utilities
+- Demo application improvements
+- Elevation profile visualization
+
+## v0.12.0
+
+### Added
+
+- Demonstration application
+- Road analysis report
+- Elevation profile visualization
+- RoadSegment statistics
+
+### Improved
+
+- Example application
+- Project documentation
 
 ## v0.11.0
 
@@ -341,11 +436,11 @@ Development rules:
 
 Planned features include:
 
-- GPX Writer
-- OpenStreetMap integration
+- OpenStreetMap support
 - KML support
 - REST API
 - PyPI release
+- Interactive map visualization
 
 ---
 
