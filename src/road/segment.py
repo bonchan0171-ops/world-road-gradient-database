@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass, field
 
+from src.models.road_statistics import RoadStatistics
+
 
 @dataclass(slots=True)
 class RoadSegment:
@@ -96,13 +98,15 @@ class RoadSegment:
 
         return sum(self.gradients) / len(self.gradients)
 
-    def statistics(self) -> dict[str, float]:
-        return {
-            "distance": self.total_distance(),
-            "ascent": self.total_ascent(),
-            "descent": self.total_descent(),
-            "highest_elevation": self.highest_elevation(),
-            "lowest_elevation": self.lowest_elevation(),
-            "max_gradient": self.max_gradient(),
-            "average_gradient": self.average_gradient(),
-        }
+    def statistics(self) -> RoadStatistics:
+        """Return summary statistics for the road segment."""
+
+        return RoadStatistics(
+            distance=self.total_distance(),
+            ascent=self.total_ascent(),
+            descent=self.total_descent(),
+            highest_elevation=self.highest_elevation(),
+            lowest_elevation=self.lowest_elevation(),
+            max_gradient=self.max_gradient(),
+            average_gradient=self.average_gradient(),
+        )

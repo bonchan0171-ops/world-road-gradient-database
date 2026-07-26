@@ -277,13 +277,13 @@ print(f"Loaded {len(coordinates)} coordinates.")
 ```python
 stats = road_segment.statistics()
 
-print(stats["distance"])
-print(stats["ascent"])
-print(stats["descent"])
-print(stats["highest_elevation"])
-print(stats["lowest_elevation"])
-print(stats["max_gradient"])
-print(stats["average_gradient"])
+print(stats.distance)
+print(stats.ascent)
+print(stats.descent)
+print(stats.highest_elevation)
+print(stats.lowest_elevation)
+print(stats.max_gradient)
+print(stats.average_gradient)
 ```
 
 Example output:

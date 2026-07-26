@@ -46,19 +46,19 @@ def print_report(road_segment: RoadSegment) -> None:
     print(" Road Analysis Report")
     print("=" * 40)
 
-    print(f"Distance           : {stats['distance']:8.1f} m")
-    print(f"Total Ascent       : {stats['ascent']:8.1f} m")
-    print(f"Total Descent      : {stats['descent']:8.1f} m")
+    print(f"Distance           : {stats.distance:8.1f} m")
+    print(f"Total Ascent       : {stats.ascent:8.1f} m")
+    print(f"Total Descent      : {stats.descent:8.1f} m")
 
     print()
 
-    print(f"Highest Elevation  : {stats['highest_elevation']:8.1f} m")
-    print(f"Lowest Elevation   : {stats['lowest_elevation']:8.1f} m")
+    print(f"Highest Elevation  : {stats.highest_elevation:8.1f} m")
+    print(f"Lowest Elevation   : {stats.lowest_elevation:8.1f} m")
 
     print()
 
-    print(f"Max Gradient       : {stats['max_gradient']:8.2f} %")
-    print(f"Average Gradient   : {stats['average_gradient']:8.2f} %")
+    print(f"Max Gradient       : {stats.max_gradient:8.2f} %")
+    print(f"Average Gradient   : {stats.average_gradient:8.2f} %")
 
 
 def plot_elevation_profile(

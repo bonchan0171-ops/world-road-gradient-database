@@ -2,6 +2,7 @@
 
 import pytest
 
+from src.models import RoadStatistics
 from src.road.segment import RoadSegment
 
 
@@ -127,10 +128,12 @@ def test_statistics() -> None:
 
     stats = segment.statistics()
 
-    assert stats["distance"] == segment.total_distance()
-    assert stats["ascent"] == segment.total_ascent()
-    assert stats["descent"] == segment.total_descent()
-    assert stats["highest_elevation"] == segment.highest_elevation()
-    assert stats["lowest_elevation"] == segment.lowest_elevation()
-    assert stats["max_gradient"] == segment.max_gradient()
-    assert stats["average_gradient"] == segment.average_gradient()
+    assert isinstance(stats, RoadStatistics)
+
+    assert stats.distance == segment.total_distance()
+    assert stats.ascent == segment.total_ascent()
+    assert stats.descent == segment.total_descent()
+    assert stats.highest_elevation == segment.highest_elevation()
+    assert stats.lowest_elevation == segment.lowest_elevation()
+    assert stats.max_gradient == segment.max_gradient()
+    assert stats.average_gradient == segment.average_gradient()

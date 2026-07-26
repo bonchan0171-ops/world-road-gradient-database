@@ -13,6 +13,21 @@ No unreleased changes.
 
 ---
 
+## v0.14.0
+
+### Added
+
+- Road Statistics API (`RoadSegment.statistics()`)
+- Unified road statistics retrieval
+- Added unit test for `statistics()`
+
+### Changed
+
+- Updated Demo application to use the Statistics API
+- Updated CLI to use the Statistics API
+
+---
+
 ## [v0.13.0] - 2026-07-26
 
 ### Added
