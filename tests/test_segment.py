@@ -110,3 +110,27 @@ def test_average_gradient() -> None:
     )
 
     assert segment.average_gradient() == 5.0
+
+
+def test_statistics() -> None:
+    """Statistics should return summary values correctly."""
+    segment = RoadSegment(
+        coordinates=[
+            (35.0, 135.0),
+            (35.1, 135.1),
+            (35.2, 135.2),
+        ],
+        elevations=[100.0, 110.0, 120.0],
+        distances=[100.0, 200.0],
+        gradients=[6.0, 4.0],
+    )
+
+    stats = segment.statistics()
+
+    assert stats["distance"] == segment.total_distance()
+    assert stats["ascent"] == segment.total_ascent()
+    assert stats["descent"] == segment.total_descent()
+    assert stats["highest_elevation"] == segment.highest_elevation()
+    assert stats["lowest_elevation"] == segment.lowest_elevation()
+    assert stats["max_gradient"] == segment.max_gradient()
+    assert stats["average_gradient"] == segment.average_gradient()

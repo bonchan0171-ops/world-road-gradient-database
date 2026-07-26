@@ -40,6 +40,7 @@ Current features include:
 * ✅ GPX Track reader
 * ✅ GPX Track writer
 * ✅ GPX elevation (`<ele>`) support
+* ✅ Road Statistics API
 
 ## ElevationProfile
 
@@ -269,6 +270,36 @@ coordinates = reader.read()
 print(f"Loaded {len(coordinates)} coordinates.")
 ```
 
+## Road Statistics API
+
+`RoadSegment` provides a unified API for retrieving summary statistics.
+
+```python
+stats = road_segment.statistics()
+
+print(stats["distance"])
+print(stats["ascent"])
+print(stats["descent"])
+print(stats["highest_elevation"])
+print(stats["lowest_elevation"])
+print(stats["max_gradient"])
+print(stats["average_gradient"])
+```
+
+Example output:
+
+```text
+{
+    "distance": 423.9,
+    "ascent": 3.0,
+    "descent": 1.3,
+    "highest_elevation": 11.7,
+    "lowest_elevation": 8.7,
+    "max_gradient": 1.45,
+    "average_gradient": 0.41,
+}
+```
+
 ## GPX Writer Example
 
 ```python
@@ -333,6 +364,15 @@ pytest --cov=src --cov-report=term-missing
 ---
 
 # Version History
+
+## v0.14.0
+
+### Added
+
+- Road Statistics API (`RoadSegment.statistics()`)
+- Unified road statistics retrieval
+- Updated Demo and CLI to use the Statistics API
+- Added unit tests for `statistics()`
 
 ## v0.13.0
 

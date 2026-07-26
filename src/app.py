@@ -39,24 +39,26 @@ def load_route(path: Path) -> list[Coordinate]:
 def print_report(road_segment: RoadSegment) -> None:
     """Print a road analysis report."""
 
+    stats = road_segment.statistics()
+
     print()
     print("=" * 40)
     print(" Road Analysis Report")
     print("=" * 40)
 
-    print(f"Distance           : {road_segment.total_distance():8.1f} m")
-    print(f"Total Ascent       : {road_segment.total_ascent():8.1f} m")
-    print(f"Total Descent      : {road_segment.total_descent():8.1f} m")
+    print(f"Distance           : {stats['distance']:8.1f} m")
+    print(f"Total Ascent       : {stats['ascent']:8.1f} m")
+    print(f"Total Descent      : {stats['descent']:8.1f} m")
 
     print()
 
-    print(f"Highest Elevation  : {road_segment.highest_elevation():8.1f} m")
-    print(f"Lowest Elevation   : {road_segment.lowest_elevation():8.1f} m")
+    print(f"Highest Elevation  : {stats['highest_elevation']:8.1f} m")
+    print(f"Lowest Elevation   : {stats['lowest_elevation']:8.1f} m")
 
     print()
 
-    print(f"Max Gradient       : {road_segment.max_gradient():8.2f} %")
-    print(f"Average Gradient   : {road_segment.average_gradient():8.2f} %")
+    print(f"Max Gradient       : {stats['max_gradient']:8.2f} %")
+    print(f"Average Gradient   : {stats['average_gradient']:8.2f} %")
 
 
 def plot_elevation_profile(
