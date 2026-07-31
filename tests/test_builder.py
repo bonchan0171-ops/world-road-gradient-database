@@ -1,6 +1,6 @@
 import pytest
 
-from src.road.builder import RoadSegmentBuilder
+from wrgd.road.builder import RoadSegmentBuilder
 
 
 class FakeDEMLoader:

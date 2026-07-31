@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from src.models import Coordinate
+from wrgd.models import Coordinate
 
 
 class GeoJSONReader:

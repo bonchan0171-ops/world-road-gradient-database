@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from src.cli import main
+from wrgd.cli import main
 
 
 def test_cli() -> None:

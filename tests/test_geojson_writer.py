@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from src.io.geojson_writer import GeoJSONWriter
-from src.models import Coordinate
+from wrgd.io.geojson_writer import GeoJSONWriter
+from wrgd.models import Coordinate
 
 
 def test_write_geojson(tmp_path: Path) -> None:

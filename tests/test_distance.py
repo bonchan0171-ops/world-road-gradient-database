@@ -1,6 +1,6 @@
 import pytest
 
-from src.geometry.distance import calculate_distance
+from wrgd.geometry.distance import calculate_distance
 
 
 def test_same_point():

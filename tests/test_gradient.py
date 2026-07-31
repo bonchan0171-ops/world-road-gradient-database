@@ -4,7 +4,7 @@ Tests for gradient calculation.
 
 import pytest
 
-from src.geometry.gradient import calculate_gradient
+from wrgd.geometry.gradient import calculate_gradient
 
 
 def test_uphill_gradient():

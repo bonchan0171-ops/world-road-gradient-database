@@ -2,14 +2,14 @@
 
 from pathlib import Path
 
-from src.app import (
+from wrgd.app import (
     load_route,
     plot_elevation_profile,
     print_report,
     to_builder_coordinates,
 )
-from src.io.dem_loader import DEMLoader
-from src.road.builder import RoadSegmentBuilder
+from wrgd.io.dem_loader import DEMLoader
+from wrgd.road.builder import RoadSegmentBuilder
 
 
 def main() -> None:

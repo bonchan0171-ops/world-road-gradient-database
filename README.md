@@ -93,25 +93,44 @@ The demo also generates an elevation profile image:
 output/elevation_profile.png
 ```
 
-## Command Line Interface
+## Quick Start
 
-WRGD includes a simple command-line interface.
+Prepare a route file and a DEM file, then run the installed CLI.
+
+- Route must be a GPX or GeoJSON file.
+- DEM must be a GeoTIFF file.
+- Replace `<route>` and `<dem>` in the command below with your own file paths.
+- The sample files used in `examples/demo.py` can be replaced with your own route and DEM data.
+
+```bash
+wrgd --route <route> --dem <dem>
+```
 
 Example:
 
 ```bash
-python -m src.cli \
-    --route data/sample/sample.gpx \
-    --dem data/raw/output_hh.tif
+wrgd --route data/sample/sample.gpx --dem data/raw/output_hh.tif
 ```
 
 Example output:
 
 ```text
-WRGD CLI
-Route : data/sample/sample.gpx
-DEM   : data/raw/output_hh.tif
+Distance           :    423.9 m
+Total Ascent       :      3.0 m
+Total Descent      :      1.3 m
+
+Highest Elevation  :     11.7 m
+Lowest Elevation   :      8.7 m
+
+Max Gradient       :     1.45 %
+Average Gradient   :     0.41 %
 ```
+
+## Command Line Interface
+
+WRGD includes a simple command-line interface.
+
+The CLI reads a route file in GPX or GeoJSON format and a GeoTIFF DEM file, then prints the road analysis report.
 
 # Quality Assurance
 
@@ -131,13 +150,22 @@ Current test coverage:
 ### Example
 
 ```python
-from src.profile import ElevationProfile
+from pathlib import Path
 
-profile = ElevationProfile(segment)
+from wrgd import Coordinate, DEMLoader, RoadSegmentBuilder
+from wrgd.app import load_route, print_report
 
-print(profile.max_elevation())
-print(profile.total_ascent())
-print(profile.cumulative_distances())
+route = Path("data/sample/sample.gpx")
+dem = Path("data/raw/output_hh.tif")
+
+coordinates = load_route(route)
+builder_coordinates = [(point.latitude, point.longitude) for point in coordinates]
+
+dem_loader = DEMLoader(dem)
+dem_loader.load()
+
+segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+print_report(segment)
 ```
 
 ---
@@ -253,8 +281,10 @@ git clone https://github.com/bonchan0171-ops/world-road-gradient-database.git
 
 cd world-road-gradient-database
 
-python -m pip install -r requirements.txt
+python -m pip install -e .
 ```
+
+This installs the WRGD package in editable mode so the `wrgd` command is available.
 
 ---
 

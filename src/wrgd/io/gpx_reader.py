@@ -7,7 +7,7 @@ from __future__ import annotations
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from src.models import Coordinate
+from wrgd.models import Coordinate
 
 
 class GPXReader:

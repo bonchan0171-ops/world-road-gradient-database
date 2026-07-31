@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from src.io.gpx_reader import GPXReader
+from wrgd.io.gpx_reader import GPXReader
 
 
 def test_read_gpx(tmp_path: Path) -> None:

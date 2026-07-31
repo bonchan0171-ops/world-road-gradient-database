@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from src.io.gpx_writer import GPXWriter
+from wrgd.io.gpx_writer import GPXWriter
 
 
 def test_write_gpx(tmp_path: Path) -> None:

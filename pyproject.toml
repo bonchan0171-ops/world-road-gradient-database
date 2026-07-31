@@ -1,3 +1,55 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wrgd"
+version = "0.17.0"
+description = "World Road Geometry Database (WRGD)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+authors = [
+    { name = "bonchan0171-ops" }
+]
+
+keywords = [
+    "gis",
+    "dem",
+    "geography",
+    "road",
+    "elevation",
+    "gradient",
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+
+dependencies = [
+    "numpy",
+    "rasterio",
+]
+
+[project.urls]
+Repository = "https://github.com/bonchan0171-ops/world-road-gradient-database"
+
+[project.scripts]
+wrgd = "wrgd.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.black]
 line-length = 88
 target-version = ["py312"]
@@ -8,9 +60,9 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle Errors
-    "F",  # Pyflakes
-    "I",  # Import Sort
+    "E",
+    "F",
+    "I",
 ]
 
 [tool.ruff.format]

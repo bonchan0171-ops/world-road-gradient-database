@@ -4,14 +4,14 @@ from pathlib import Path
 
 from pytest import CaptureFixture
 
-from src.app import (
+from wrgd.app import (
     load_route,
     plot_elevation_profile,
     print_report,
     to_builder_coordinates,
 )
-from src.models import Coordinate
-from src.road.segment import RoadSegment
+from wrgd.models import Coordinate
+from wrgd.road.segment import RoadSegment
 
 
 def test_to_builder_coordinates() -> None:

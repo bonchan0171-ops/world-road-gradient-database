@@ -7,7 +7,7 @@ elevation data stored in a RoadSegment.
 
 from __future__ import annotations
 
-from src.road.segment import RoadSegment
+from wrgd.road.segment import RoadSegment
 
 
 class ElevationProfile:
@@ -58,7 +58,7 @@ class ElevationProfile:
         float
             Maximum elevation in meters.
         """
-        return max(self._segment.elevations)
+        return float(max(self._segment.elevations))
 
     def min_elevation(self) -> float:
         """
@@ -69,7 +69,7 @@ class ElevationProfile:
         float
             Minimum elevation in meters.
         """
-        return min(self._segment.elevations)
+        return float(min(self._segment.elevations))
 
     def elevation_profile(self) -> list[float]:
         """

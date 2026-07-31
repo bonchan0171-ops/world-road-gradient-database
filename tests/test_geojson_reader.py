@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from src.io.geojson_reader import GeoJSONReader
-from src.models import Coordinate
+from wrgd.io.geojson_reader import GeoJSONReader
+from wrgd.models import Coordinate
 
 
 def test_read_geojson() -> None:

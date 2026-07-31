@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, field
 
-from src.models.road_statistics import RoadStatistics
+from wrgd.models.road_statistics import RoadStatistics
 
 
 @dataclass(slots=True)

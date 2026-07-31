@@ -3,13 +3,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import cast
 
 import matplotlib.pyplot as plt
 
-from src.io.geojson_reader import GeoJSONReader
-from src.io.gpx_reader import GPXReader
-from src.models import Coordinate
-from src.road.segment import RoadSegment
+from wrgd.io.geojson_reader import GeoJSONReader
+from wrgd.io.gpx_reader import GPXReader
+from wrgd.models import Coordinate
+from wrgd.road.segment import RoadSegment
 
 
 def to_builder_coordinates(
@@ -28,10 +29,10 @@ def load_route(path: Path) -> list[Coordinate]:
     suffix = path.suffix.lower()
 
     if suffix == ".gpx":
-        return GPXReader(path).read()
+        return cast(list[Coordinate], GPXReader(path).read())
 
     if suffix == ".geojson":
-        return GeoJSONReader(path).read()
+        return cast(list[Coordinate], GeoJSONReader(path).read())
 
     raise ValueError(f"Unsupported file format: {suffix}")
 

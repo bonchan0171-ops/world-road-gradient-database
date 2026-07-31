@@ -1,4 +1,4 @@
-from src.io.dem_loader import DEMLoader
+from wrgd.io.dem_loader import DEMLoader
 
 
 def main():

@@ -7,6 +7,23 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.17.0
+
+### Added
+
+- CLI-enabled road analysis execution
+- Public API entrypoint cleanup for package usage
+- README onboarding updates for Installation, Quick Start, and Python API
+- Improved CLI user-facing error handling
+- CLI input information display
+
+### Changed
+
+- Migrated the codebase to the `src/wrgd` package structure
+- Updated tests to align with the new package layout
+
+---
+
 ## [Unreleased]
 
 No unreleased changes.

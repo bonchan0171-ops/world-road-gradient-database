@@ -1,4 +1,4 @@
-from src.models import Coordinate
+from wrgd.models import Coordinate
 
 
 def test_coordinate_creation() -> None:

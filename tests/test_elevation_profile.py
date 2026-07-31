@@ -1,7 +1,7 @@
 """Tests for ElevationProfile."""
 
-from src.profile import ElevationProfile
-from src.road.segment import RoadSegment
+from wrgd.profile import ElevationProfile
+from wrgd.road.segment import RoadSegment
 
 
 def create_segment() -> RoadSegment:

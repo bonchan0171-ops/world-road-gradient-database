@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from src.geometry.distance import calculate_distance
-from src.geometry.gradient import calculate_gradient
-from src.io.dem_loader import DEMLoader
-from src.road.segment import RoadSegment
+from wrgd.geometry.distance import calculate_distance
+from wrgd.geometry.gradient import calculate_gradient
+from wrgd.io.dem_loader import DEMLoader
+from wrgd.road.segment import RoadSegment
 
 Coordinate = tuple[float, float]
 Coordinates = list[Coordinate]

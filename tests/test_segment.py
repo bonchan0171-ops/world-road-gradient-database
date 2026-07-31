@@ -2,8 +2,8 @@
 
 import pytest
 
-from src.models import RoadStatistics
-from src.road.segment import RoadSegment
+from wrgd.models import RoadStatistics
+from wrgd.road.segment import RoadSegment
 
 
 def test_create_road_segment() -> None:
