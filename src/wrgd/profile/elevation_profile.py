@@ -7,6 +7,14 @@ elevation data stored in a RoadSegment.
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import matplotlib
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
+
 from wrgd.road.segment import RoadSegment
 
 
@@ -49,6 +57,10 @@ class ElevationProfile:
 
         return cumulative
 
+    def get_distances(self) -> tuple[float, ...]:
+        """Return cumulative distance data as an immutable read-only sequence."""
+        return tuple(self.cumulative_distances())
+
     def max_elevation(self) -> float:
         """
         Return the maximum elevation.
@@ -81,6 +93,17 @@ class ElevationProfile:
             Elevation values.
         """
         return list(self._segment.elevations)
+
+    def get_elevations(self) -> tuple[float, ...]:
+        """Return elevation data as an immutable read-only sequence."""
+        return tuple(self.elevation_profile())
+
+    def to_dict(self) -> dict[str, list[float]]:
+        """Return JSON-serializable distance and elevation data."""
+        return {
+            "distances": list(self.get_distances()),
+            "elevations": list(self.get_elevations()),
+        }
 
     def total_ascent(self) -> float:
         """
@@ -119,3 +142,26 @@ class ElevationProfile:
                 descent += previous - current
 
         return descent
+
+    def save_image(
+        self,
+        output_path: Path,
+        title: str = "WRGD Elevation Profile",
+        dpi: int = 150,
+    ) -> None:
+        """Save the elevation profile as a PNG image."""
+        distances = self.get_distances()
+        elevations = self.get_elevations()
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(distances, elevations, linewidth=2)
+        plt.title(title)
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Elevation (m)")
+        plt.grid(True)
+        plt.tight_layout()
+
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+
+        plt.savefig(output_path, dpi=dpi)
+        plt.close()

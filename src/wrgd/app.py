@@ -5,6 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+import matplotlib
+
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 
 from wrgd.io.geojson_reader import GeoJSONReader

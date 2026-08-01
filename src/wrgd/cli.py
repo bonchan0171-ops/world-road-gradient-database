@@ -15,6 +15,7 @@ from wrgd.app import (
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.json_writer import write_json
+from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 
 
@@ -46,6 +47,11 @@ def main() -> None:
     parser.add_argument(
         "--json",
         help="Optional output JSON path for road statistics",
+    )
+
+    parser.add_argument(
+        "--output",
+        help="Optional output PNG path for the elevation profile image",
     )
 
     args = parser.parse_args()
@@ -83,6 +89,9 @@ def main() -> None:
 
         if args.json:
             write_json(statistics, Path(args.json))
+
+        if args.output:
+            ElevationProfile(road_segment).save_image(Path(args.output))
 
         print("WRGD CLI")
         print(f"Route : {route_file}")

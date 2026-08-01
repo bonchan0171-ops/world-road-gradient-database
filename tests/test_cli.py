@@ -113,3 +113,48 @@ def test_cli_writes_json_when_option_is_given() -> None:
                 mock_segment.statistics.return_value,
                 Path("output.json"),
             )
+
+
+def test_cli_writes_png_when_output_option_is_given() -> None:
+    """CLI should save an elevation profile image when --output is provided."""
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--route",
+            "tests/data/sample.geojson",
+            "--dem",
+            "sample.tif",
+            "--output",
+            "output.png",
+        ],
+    ):
+        with (
+            patch("pathlib.Path.exists", return_value=True),
+            patch(
+                "wrgd.cli.load_route",
+                return_value=[],
+            ),
+            patch("wrgd.cli.to_builder_coordinates", return_value=[]),
+            patch("wrgd.cli.DEMLoader") as mock_dem_loader,
+            patch("wrgd.cli.RoadSegmentBuilder") as mock_builder,
+            patch("wrgd.cli.ElevationProfile") as mock_profile_class,
+        ):
+            mock_dem_loader.return_value
+            mock_segment = mock_builder.return_value.build.return_value
+            mock_segment.statistics.return_value = RoadStatistics(
+                distance=0.0,
+                ascent=0.0,
+                descent=0.0,
+                highest_elevation=0.0,
+                lowest_elevation=0.0,
+                max_gradient=0.0,
+                average_gradient=0.0,
+            )
+            mock_profile = mock_profile_class.return_value
+
+            main()
+
+            mock_profile_class.assert_called_once_with(mock_segment)
+            mock_profile.save_image.assert_called_once_with(Path("output.png"))

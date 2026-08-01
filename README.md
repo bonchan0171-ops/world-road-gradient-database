@@ -132,6 +132,34 @@ WRGD includes a simple command-line interface.
 
 The CLI reads a route file in GPX or GeoJSON format and a GeoTIFF DEM file, then prints the road analysis report.
 
+## ElevationProfile API Example
+
+You can also use `ElevationProfile` directly from Python to get JSON-serializable data for external integrations.
+
+```python
+from wrgd.profile import ElevationProfile
+from wrgd.road.segment import RoadSegment
+
+segment = RoadSegment(
+    coordinates=[(35.0, 139.0), (35.1, 139.1)],
+    elevations=[100.0, 110.0],
+    distances=[100.0],
+    gradients=[10.0],
+)
+
+profile = ElevationProfile(segment)
+print(profile.to_dict())
+```
+
+Example output:
+
+```python
+{
+    "distances": [0.0, 100.0],
+    "elevations": [100.0, 110.0],
+}
+```
+
 # Quality Assurance
 
 WRGD follows modern Python OSS development practices.
