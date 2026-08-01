@@ -12,7 +12,9 @@ from wrgd.app import (
     print_report,
     to_builder_coordinates,
 )
+from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
+from wrgd.io.json_writer import write_json
 from wrgd.road.builder import RoadSegmentBuilder
 
 
@@ -34,6 +36,16 @@ def main() -> None:
         "--dem",
         required=True,
         help="DEM file (.tif)",
+    )
+
+    parser.add_argument(
+        "--csv",
+        help="Optional output CSV path for road statistics",
+    )
+
+    parser.add_argument(
+        "--json",
+        help="Optional output JSON path for road statistics",
     )
 
     args = parser.parse_args()
@@ -64,6 +76,13 @@ def main() -> None:
         dem_loader.load()
 
         road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+        statistics = road_segment.statistics()
+
+        if args.csv:
+            write_csv(statistics, Path(args.csv))
+
+        if args.json:
+            write_json(statistics, Path(args.json))
 
         print("WRGD CLI")
         print(f"Route : {route_file}")

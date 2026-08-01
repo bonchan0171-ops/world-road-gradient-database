@@ -7,6 +7,20 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.18.0 - Sprint 17
+
+### Added
+
+- CLI CSV export support via `--csv`
+- CLI JSON export support via `--json`
+- Optional statistics file output while preserving the existing console report display
+
+### Changed
+
+- Updated CLI to support saving analysis statistics to CSV and JSON files without changing the existing screen output flow
+
+---
+
 ## v0.17.0
 
 ### Added
