@@ -48,8 +48,6 @@ class RoadSegment:
         """Return the total distance in meters."""
         return sum(self.distances)
 
-        return sum(self.gradients) / len(self.gradients)
-
     def max_gradient(self) -> float:
         """Return the maximum gradient (%)."""
         if not self.gradients:
