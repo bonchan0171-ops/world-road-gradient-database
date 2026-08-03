@@ -38,6 +38,22 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.20.0 - Sprint 20
+
+### Added
+
+- README onboarding improvements for first-time users
+- Beginner-friendly Quick Start and installation guidance
+- New example scripts aligned with the README workflow
+- API usage examples for `RoadStatistics`, `ElevationProfile`, `RoadSegmentBuilder`, and reader/writer classes
+
+### Changed
+
+- Reorganized `examples/` to provide clearer entrypoints for Quick Start, Python API, and CLI export workflows
+- Expanded README and API documentation sections to improve consistency across usage examples
+
+---
+
 ## [Unreleased]
 
 No unreleased changes.
