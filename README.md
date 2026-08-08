@@ -28,6 +28,7 @@ WRGD currently supports:
 - `ElevationProfile` analysis and PNG export
 - GPX and GeoJSON route reading
 - CSV and JSON export for road statistics
+- Analysis helpers for statistics, difficulty, and score evaluation via the `wrgd.analysis` API
 - CLI support via the `wrgd` command
 
 ---
@@ -180,6 +181,31 @@ The PNG file is an elevation profile chart created from the road segment data.
 ## API Examples
 
 The following examples use the current public APIs from the `wrgd` package.
+
+### Analysis utilities
+
+The `wrgd.analysis` package provides helpers for evaluating road routes through statistics, difficulty, and score APIs.
+
+```python
+from wrgd.analysis import calculate_difficulty, calculate_score
+from wrgd.models import RoadStatistics
+
+statistics = RoadStatistics(
+    distance=1000.0,
+    ascent=50.0,
+    descent=20.0,
+    highest_elevation=150.0,
+    lowest_elevation=100.0,
+    max_gradient=2.0,
+    average_gradient=1.0,
+)
+
+difficulty = calculate_difficulty(statistics)
+score = calculate_score(statistics)
+
+print(difficulty.name)
+print(score)
+```
 
 ### RoadStatistics
 

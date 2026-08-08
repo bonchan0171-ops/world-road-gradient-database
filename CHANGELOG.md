@@ -54,6 +54,19 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.21.0 - Sprint 21
+
+### Added
+
+- Analysis API utilities for `calculate_statistics`, `calculate_difficulty`, and `calculate_score`
+- Road evaluation helpers for statistics, difficulty, and score analysis
+
+### Changed
+
+- Updated analysis documentation and examples to reflect the new scoring workflow
+
+---
+
 ## [Unreleased]
 
 No unreleased changes.
