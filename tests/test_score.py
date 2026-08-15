@@ -33,3 +33,19 @@ def test_calculate_score_is_clamped_to_hundred() -> None:
     score = calculate_score(statistics)
 
     assert score == 100.0
+
+
+def test_calculate_score_is_clamped_to_zero() -> None:
+    statistics = RoadStatistics(
+        distance=-1000.0,
+        ascent=-100.0,
+        descent=0.0,
+        highest_elevation=0.0,
+        lowest_elevation=0.0,
+        max_gradient=-2.0,
+        average_gradient=0.0,
+    )
+
+    score = calculate_score(statistics)
+
+    assert score == 0.0

@@ -37,6 +37,9 @@ def test_empty_road_segment() -> None:
     assert segment.segment_count() == 0
     assert segment.total_distance() == 0.0
     assert segment.average_gradient() == 0.0
+    assert segment.max_gradient() == 0.0
+    assert segment.highest_elevation() == 0.0
+    assert segment.lowest_elevation() == 0.0
 
 
 def test_invalid_elevation_length() -> None:

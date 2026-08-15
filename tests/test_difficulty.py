@@ -36,3 +36,54 @@ def test_calculate_difficulty_returns_level_for_hard_route() -> None:
     assert difficulty.level == 5
     assert difficulty.name == "非常に難しい"
     assert difficulty.score >= 0.0
+
+
+def test_calculate_difficulty_returns_level_2() -> None:
+    statistics = RoadStatistics(
+        distance=2000.0,
+        ascent=100.0,
+        descent=0.0,
+        highest_elevation=100.0,
+        lowest_elevation=0.0,
+        max_gradient=0.0,
+        average_gradient=0.0,
+    )
+
+    difficulty = calculate_difficulty(statistics)
+
+    assert difficulty.level == 2
+    assert difficulty.name == "易しい"
+
+
+def test_calculate_difficulty_returns_level_3() -> None:
+    statistics = RoadStatistics(
+        distance=4000.0,
+        ascent=225.0,
+        descent=0.0,
+        highest_elevation=200.0,
+        lowest_elevation=0.0,
+        max_gradient=0.0,
+        average_gradient=0.0,
+    )
+
+    difficulty = calculate_difficulty(statistics)
+
+    assert difficulty.level == 3
+    assert difficulty.name == "普通"
+
+
+def test_calculate_difficulty_returns_level_4() -> None:
+    statistics = RoadStatistics(
+        distance=6000.0,
+        ascent=525.0,
+        descent=0.0,
+        highest_elevation=500.0,
+        lowest_elevation=0.0,
+        max_gradient=0.0,
+        average_gradient=0.0,
+    )
+
+    difficulty = calculate_difficulty(statistics)
+
+    assert difficulty.level == 4
+    assert difficulty.name == "難しい"
