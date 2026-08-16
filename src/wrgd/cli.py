@@ -7,6 +7,8 @@ from pathlib import Path
 
 import rasterio.errors
 
+from wrgd.analysis.difficulty import calculate_difficulty
+from wrgd.analysis.score import calculate_score
 from wrgd.app import (
     load_route,
     print_report,
@@ -83,6 +85,8 @@ def main() -> None:
 
         road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
         statistics = road_segment.statistics()
+        difficulty = calculate_difficulty(statistics)
+        score = calculate_score(statistics)
 
         if args.csv:
             write_csv(statistics, Path(args.csv))
@@ -98,6 +102,10 @@ def main() -> None:
         print(f"DEM   : {dem_file}")
         print(f"Points: {len(coordinates)}")
         print_report(road_segment)
+
+        print(f"Difficulty        : {difficulty.name}")
+        print(f"Difficulty Level  : {difficulty.level}")
+        print(f"Evaluation Score  : {score:.1f}")
     except (ValueError, RuntimeError, rasterio.errors.RasterioIOError) as error:
         print(f"Error: {error}")
 
