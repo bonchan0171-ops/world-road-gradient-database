@@ -1,5 +1,6 @@
 """Tests for WRGD CLI."""
 
+import unittest.mock as mock
 from pathlib import Path
 from unittest.mock import patch
 
@@ -66,6 +67,8 @@ def test_cli_writes_csv_when_option_is_given() -> None:
             mock_write_csv.assert_called_once_with(
                 mock_segment.statistics.return_value,
                 Path("output.csv"),
+                difficulty=mock.ANY,
+                score=mock.ANY,
             )
 
 
@@ -112,6 +115,8 @@ def test_cli_writes_json_when_option_is_given() -> None:
             mock_write_json.assert_called_once_with(
                 mock_segment.statistics.return_value,
                 Path("output.json"),
+                difficulty=mock.ANY,
+                score=mock.ANY,
             )
 
 

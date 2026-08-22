@@ -5,10 +5,16 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
+from wrgd.models.difficulty import DifficultyLevel
 from wrgd.models.road_statistics import RoadStatistics
 
 
-def write_csv(statistics: RoadStatistics, output_path: Path) -> None:
+def write_csv(
+    statistics: RoadStatistics,
+    output_path: Path,
+    difficulty: DifficultyLevel | None = None,
+    score: float | None = None,
+) -> None:
     """Write a RoadStatistics instance to a CSV file with a header row.
 
     Parameters
@@ -34,6 +40,9 @@ def write_csv(statistics: RoadStatistics, output_path: Path) -> None:
         "lowest_elevation",
         "max_gradient",
         "average_gradient",
+        "difficulty_level",
+        "difficulty_name",
+        "score",
     ]
 
     with output_path.open("w", encoding="utf-8", newline="") as csv_file:
@@ -48,5 +57,8 @@ def write_csv(statistics: RoadStatistics, output_path: Path) -> None:
                 "lowest_elevation": statistics.lowest_elevation,
                 "max_gradient": statistics.max_gradient,
                 "average_gradient": statistics.average_gradient,
+                "difficulty_level": difficulty.level if difficulty else "",
+                "difficulty_name": difficulty.name if difficulty else "",
+                "score": score if score is not None else "",
             }
         )

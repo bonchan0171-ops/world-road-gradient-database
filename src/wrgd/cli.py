@@ -89,10 +89,20 @@ def main() -> None:
         score = calculate_score(statistics)
 
         if args.csv:
-            write_csv(statistics, Path(args.csv))
+            write_csv(
+                statistics,
+                Path(args.csv),
+                difficulty=difficulty,
+                score=score,
+            )
 
         if args.json:
-            write_json(statistics, Path(args.json))
+            write_json(
+                statistics,
+                Path(args.json),
+                difficulty=difficulty,
+                score=score,
+            )
 
         if args.output:
             ElevationProfile(road_segment).save_image(Path(args.output))

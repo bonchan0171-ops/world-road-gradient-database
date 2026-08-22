@@ -5,10 +5,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from wrgd.models.difficulty import DifficultyLevel
 from wrgd.models.road_statistics import RoadStatistics
 
 
-def write_json(statistics: RoadStatistics, output_path: Path) -> None:
+def write_json(
+    statistics: RoadStatistics,
+    output_path: Path,
+    difficulty: DifficultyLevel | None = None,
+    score: float | None = None,
+) -> None:
     """Write a RoadStatistics instance to a JSON file.
 
     Parameters
@@ -35,6 +41,15 @@ def write_json(statistics: RoadStatistics, output_path: Path) -> None:
         "max_gradient": statistics.max_gradient,
         "average_gradient": statistics.average_gradient,
     }
+
+    if difficulty is not None:
+        data["difficulty"] = {
+            "level": difficulty.level,
+            "name": difficulty.name,
+        }
+
+    if score is not None:
+        data["score"] = score
 
     with output_path.open("w", encoding="utf-8") as json_file:
         json.dump(data, json_file, ensure_ascii=False, indent=2)
