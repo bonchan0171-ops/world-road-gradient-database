@@ -26,7 +26,11 @@ class GeoJSONWriter:
         """
         self.filepath = Path(filepath)
 
-    def write(self, coordinates: list[Coordinate]) -> None:
+    def write(
+        self,
+        coordinates: list[Coordinate],
+        properties: dict[str, object] | None = None,
+    ) -> None:
         """
         Write coordinates to a GeoJSON FeatureCollection.
 
@@ -57,7 +61,7 @@ class GeoJSONWriter:
                             [coord.longitude, coord.latitude] for coord in coordinates
                         ],
                     },
-                    "properties": {},
+                    "properties": properties or {},
                 }
             ],
         }

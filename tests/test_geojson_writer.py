@@ -44,3 +44,29 @@ def test_write_empty_coordinates(tmp_path: Path) -> None:
         match="Coordinate list is empty.",
     ):
         writer.write([])
+
+
+def test_write_geojson_with_properties(tmp_path) -> None:
+    """GeoJSON should include feature properties."""
+
+    output_file = tmp_path / "route.geojson"
+
+    writer = GeoJSONWriter(output_file)
+
+    writer.write(
+        [
+            Coordinate(latitude=35.0, longitude=135.0),
+            Coordinate(latitude=35.1, longitude=135.1),
+        ],
+        properties={
+            "difficulty": "普通",
+            "score": 42.0,
+        },
+    )
+
+    data = json.loads(output_file.read_text(encoding="utf-8"))
+
+    feature = data["features"][0]
+
+    assert feature["properties"]["difficulty"] == "普通"
+    assert feature["properties"]["score"] == 42.0
