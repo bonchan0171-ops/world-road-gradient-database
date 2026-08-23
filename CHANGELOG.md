@@ -7,6 +7,74 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.22.0
+
+### Added
+
+- CLI now displays road difficulty and evaluation score
+- CSV export includes difficulty level, difficulty name, and score
+- JSON export includes difficulty object and evaluation score
+- GeoJSON Writer supports Feature properties
+- GeoJSON Writer supports segment-by-segment Feature export
+
+### Improved
+
+- GitHub Actions updated for Node.js 24 compatibility
+- Test coverage maintained at 95%
+- Total test suite expanded to 71 passing tests
+
+---
+
+## v0.21.0
+
+### Added
+
+- Difficulty model (`DifficultyLevel`)
+- Road statistics model (`RoadStatistics`)
+- Analysis package (`wrgd.analysis`)
+- Unit tests for difficulty and score calculation
+
+### Improved
+
+- Type safety with mypy
+- Analysis API documentation
+- Overall project quality and test coverage
+
+---
+
+## v0.20.0
+
+### Added
+
+- Road statistics analysis API (`calculate_statistics`)
+- Difficulty evaluation API (`calculate_difficulty`)
+- Road evaluation score API (`calculate_score`)
+- CLI support for CSV and JSON export
+- Elevation profile PNG export
+
+### Improved
+
+- API documentation and usage examples
+- CLI usability and output options
+
+---
+
+## v0.19.0
+
+### Added
+
+- PyPI Trusted Publishing workflow
+- GitHub Release automated publishing
+- Python API examples
+- CONTRIBUTING, SECURITY and CODE_OF_CONDUCT documentation
+
+### Improved
+
+- Packaging and release workflow
+- Project documentation
+
+---
+
 ## v0.18.0 - Sprint 17
 
 ### Added

@@ -1,0 +1,89 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            139.72,
+            35.77
+          ],
+          [
+            139.721,
+            35.7705
+          ]
+        ]
+      },
+      "properties": {
+        "segment_id": 0,
+        "distance": 105.97507275538075,
+        "gradient": 0.04335379318232621
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            139.721,
+            35.7705
+          ],
+          [
+            139.722,
+            35.771
+          ]
+        ]
+      },
+      "properties": {
+        "segment_id": 1,
+        "distance": 105.97458987087116,
+        "gradient": -1.227525555819497
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            139.722,
+            35.771
+          ],
+          [
+            139.723,
+            35.7715
+          ]
+        ]
+      },
+      "properties": {
+        "segment_id": 2,
+        "distance": 105.97410697976474,
+        "gradient": 1.4510883314066825
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            139.723,
+            35.7715
+          ],
+          [
+            139.724,
+            35.772
+          ]
+        ]
+      },
+      "properties": {
+        "segment_id": 3,
+        "distance": 105.97362408057738,
+        "gradient": 1.3717465905384107
+      }
+    }
+  ]
+}

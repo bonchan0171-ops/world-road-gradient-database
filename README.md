@@ -30,6 +30,9 @@ WRGD currently supports:
 - CSV and JSON export for road statistics
 - Analysis helpers for statistics, difficulty, and score evaluation via the `wrgd.analysis` API
 - CLI support via the `wrgd` command
+- Road difficulty evaluation (5 levels)
+- Road evaluation score (0–100)
+- Segment-based GeoJSON export for GIS
 
 ---
 
@@ -140,6 +143,20 @@ The options are:
 - `--csv`: optional CSV export path
 - `--json`: optional JSON export path
 - `--output`: optional PNG image output path
+
+### CLI Analysis Example
+
+```bash
+wrgd --route sample.gpx --dem output_hh.tif --csv result.csv --json result.json
+```
+
+Example output:
+
+```text
+Difficulty        : Very Easy
+Difficulty Level  : 1
+Evaluation Score  : 3.3
+```
 
 ---
 
