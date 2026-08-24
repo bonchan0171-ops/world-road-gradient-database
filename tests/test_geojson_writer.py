@@ -70,3 +70,30 @@ def test_write_geojson_with_properties(tmp_path) -> None:
 
     assert feature["properties"]["difficulty"] == "普通"
     assert feature["properties"]["score"] == 42.0
+
+
+def test_write_segments_invalid_lengths(tmp_path) -> None:
+    writer = GeoJSONWriter(tmp_path / "segments.geojson")
+
+    coords = [
+        Coordinate(35.0, 135.0),
+        Coordinate(35.1, 135.1),
+    ]
+
+    with pytest.raises(ValueError):
+        writer.write_segments(
+            coordinates=coords,
+            gradients=[],
+            distances=[100.0],
+        )
+
+
+def test_write_segments_requires_two_points(tmp_path) -> None:
+    writer = GeoJSONWriter(tmp_path / "segments.geojson")
+
+    with pytest.raises(ValueError):
+        writer.write_segments(
+            coordinates=[Coordinate(35.0, 135.0)],
+            gradients=[],
+            distances=[],
+        )
