@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 
 from wrgd.models import Coordinate
+from wrgd.visualization import gradient_to_color
 
 
 class GeoJSONWriter:
@@ -112,6 +113,7 @@ class GeoJSONWriter:
                         "segment_id": index,
                         "distance": distances[index],
                         "gradient": gradients[index],
+                        "color": gradient_to_color(gradients[index]),
                     },
                 }
             )

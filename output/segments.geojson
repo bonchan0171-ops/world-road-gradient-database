@@ -19,7 +19,8 @@
       "properties": {
         "segment_id": 0,
         "distance": 105.97507275538075,
-        "gradient": 0.04335379318232621
+        "gradient": 0.04335379318232621,
+        "color": "#01FE00"
       }
     },
     {
@@ -40,7 +41,8 @@
       "properties": {
         "segment_id": 1,
         "distance": 105.97458987087116,
-        "gradient": -1.227525555819497
+        "gradient": -1.227525555819497,
+        "color": "#00EA15"
       }
     },
     {
@@ -61,7 +63,8 @@
       "properties": {
         "segment_id": 2,
         "distance": 105.97410697976474,
-        "gradient": 1.4510883314066825
+        "gradient": 1.4510883314066825,
+        "color": "#19E600"
       }
     },
     {
@@ -82,7 +85,8 @@
       "properties": {
         "segment_id": 3,
         "distance": 105.97362408057738,
-        "gradient": 1.3717465905384107
+        "gradient": 1.3717465905384107,
+        "color": "#17E800"
       }
     }
   ]

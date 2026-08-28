@@ -33,7 +33,7 @@ WRGD currently supports:
 - Road difficulty evaluation (5 levels)
 - Road evaluation score (0–100)
 - Segment-based GeoJSON export for GIS
-
+- Gradient-based color attributes for GeoJSON visualization
 ---
 
 ## Installation
@@ -194,6 +194,31 @@ JSON example:
 The PNG file is an elevation profile chart created from the road segment data.
 
 ---
+
+## Segment GeoJSON and Geo Heatmap
+
+WRGD can export road segments as GeoJSON Features with gradient and color attributes.
+
+```bash
+python -m examples.segment_geojson
+```
+
+The output is written to:
+
+```text
+output/segments.geojson
+```
+
+Each road segment contains the following properties:
+
+- `segment_id`
+- `distance`
+- `gradient`
+- `color`
+The `color` property is a hexadecimal RGB color derived from the road gradient.
+
+The generated GeoJSON can be loaded into QGIS or other GIS software and the `color` attribute can be used for road gradient visualization.
+
 
 ## API Examples
 

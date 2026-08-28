@@ -7,6 +7,32 @@ This project follows Semantic Versioning.
 
 ---
 
+# Changelog
+
+## v0.23.0 (2026-08-27)
+
+### Added
+
+- Geo Heatmap support for segment-based GeoJSON export
+- `gradient_to_color()` utility for hexadecimal RGB color generation
+- Automatic `color` property in `GeoJSONWriter.write_segments()`
+- New visualization package (`wrgd.visualization`)
+- Example: `examples/segment_geojson.py`
+- GeoJSON color export unit tests
+
+### Improved
+
+- Updated README with Geo Heatmap documentation
+- Updated examples documentation for Segment GeoJSON
+
+### Quality
+
+- Ruff / Black / mypy passed
+- pytest: 78 passed
+
+
+---
+
 ## v0.22.0
 
 ### Added

@@ -97,3 +97,34 @@ def test_write_segments_requires_two_points(tmp_path) -> None:
             gradients=[],
             distances=[],
         )
+
+
+def test_write_segments_includes_color(tmp_path: Path) -> None:
+    output = tmp_path / "segments.geojson"
+
+    coordinates = [
+        Coordinate(35.0, 135.0),
+        Coordinate(35.1, 135.1),
+        Coordinate(35.2, 135.2),
+    ]
+
+    writer = GeoJSONWriter(output)
+
+    writer.write_segments(
+        coordinates=coordinates,
+        gradients=[0.0, 15.0],
+        distances=[100.0, 200.0],
+    )
+
+    data = json.loads(output.read_text(encoding="utf-8"))
+
+    assert len(data["features"]) == 2
+
+    first_properties = data["features"][0]["properties"]
+    second_properties = data["features"][1]["properties"]
+
+    assert first_properties["gradient"] == 0.0
+    assert first_properties["color"] == "#00FF00"
+
+    assert second_properties["gradient"] == 15.0
+    assert second_properties["color"] == "#FF0000"
