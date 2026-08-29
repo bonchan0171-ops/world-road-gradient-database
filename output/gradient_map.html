@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>WRGD Gradient Heatmap</title>
+
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.legend {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,.25);
+    font: 12px sans-serif;
+}
+
+.legend h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+}
+
+.legend div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.legend span {
+    width: 18px;
+    height: 8px;
+    display: inline-block;
+    margin-right: 6px;
+}
+</style>
+</head>
+
+<body>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const geojsonData = {"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[139.72, 35.77], [139.721, 35.7705]]}, "properties": {"segment_id": 0, "distance": 105.97507275538075, "gradient": 0.04335379318232621, "color": "#01FE00"}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[139.721, 35.7705], [139.722, 35.771]]}, "properties": {"segment_id": 1, "distance": 105.97458987087116, "gradient": -1.227525555819497, "color": "#00EA15"}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[139.722, 35.771], [139.723, 35.7715]]}, "properties": {"segment_id": 2, "distance": 105.97410697976474, "gradient": 1.4510883314066825, "color": "#19E600"}}, {"type": "Feature", "geometry": {"type": "LineString", "coordinates": [[139.723, 35.7715], [139.724, 35.772]]}, "properties": {"segment_id": 3, "distance": 105.97362408057738, "gradient": 1.3717465905384107, "color": "#17E800"}}]};
+
+const map = L.map("map");
+
+L.tileLayer(
+    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+        attribution: "&copy; OpenStreetMap contributors"
+    }
+).addTo(map);
+
+const layer = L.geoJSON(geojsonData, {
+    style: feature => ({
+        color: feature.properties.color || "#00AA00",
+        weight: 5,
+        opacity: 0.95
+    }),
+
+    onEachFeature: (feature, layer) => {
+        const properties = feature.properties;
+
+        const gradient = Number(properties.gradient);
+
+        const gradientText =
+            Number.isFinite(gradient)
+                ? `${gradient >= 0 ? "+" : ""}${gradient.toFixed(2)} %`
+                : "N/A";
+
+        const popup = `
+            <strong>WRGD Segment</strong><br>
+            <br>
+            Segment ID : ${properties.segment_id}<br>
+            Distance : ${Number(properties.distance).toFixed(2)} m<br>
+            Gradient : ${gradientText}
+        `;
+
+        layer.bindPopup(popup);
+    }
+}).addTo(map);
+
+if (layer.getBounds().isValid()) {
+    map.fitBounds(layer.getBounds());
+}
+
+const legend = L.control({
+    position: "bottomright"
+});
+
+legend.onAdd = function() {
+    const div = L.DomUtil.create("div", "legend");
+    div.innerHTML =
+        "<h4>Gradient</h4>" +
+        "<div><span style=\"background:#002AD4;\"></span>-15~-10%</div><div><span style=\"background:#008080;\"></span>-10~-5%</div><div><span style=\"background:#00D42A;\"></span>-5~0%</div><div><span style=\"background:#00FF00;\"></span>0~0%</div><div><span style=\"background:#2AD400;\"></span>0~5%</div><div><span style=\"background:#808000;\"></span>5~10%</div><div><span style=\"background:#D42A00;\"></span>10~15%</div>";
+    return div;
+};
+
+legend.addTo(map);
+</script>
+</body>
+</html>

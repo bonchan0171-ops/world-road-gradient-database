@@ -7,6 +7,18 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.24.1
+
+### Added
+- Interactive Leaflet map export
+- Embedded GeoJSON for offline HTML viewing
+- Gradient legend
+- Segment popup (distance & gradient)
+
+## v0.24.0
+
+---
+
 # Changelog
 
 ## v0.23.0 (2026-08-27)
