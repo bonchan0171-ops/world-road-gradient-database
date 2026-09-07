@@ -8,6 +8,8 @@ import json
 from pathlib import Path
 
 from wrgd.models import Coordinate
+from wrgd.models.difficulty import DifficultyLevel
+from wrgd.road.segment import RoadSegment
 from wrgd.visualization import gradient_to_color
 
 
@@ -78,11 +80,27 @@ class GeoJSONWriter:
 
     def write_segments(
         self,
-        coordinates: list[Coordinate],
-        gradients: list[float],
-        distances: list[float],
+        coordinates: list[Coordinate] | RoadSegment,
+        gradients: list[float] | None = None,
+        distances: list[float] | None = None,
+        difficulty: DifficultyLevel | None = None,
+        score: float | None = None,
     ) -> None:
         """Write each road segment as an individual GeoJSON Feature."""
+
+        elevations: list[float] | None = None
+        if isinstance(coordinates, RoadSegment):
+            road_segment = coordinates
+            coordinates = [
+                Coordinate(latitude=latitude, longitude=longitude)
+                for latitude, longitude in road_segment.coordinates
+            ]
+            elevations = road_segment.elevations
+            gradients = road_segment.gradients
+            distances = road_segment.distances
+
+        if gradients is None or distances is None:
+            raise ValueError("Gradients and distances are required.")
 
         if len(coordinates) < 2:
             raise ValueError("At least two coordinates are required.")
@@ -99,6 +117,22 @@ class GeoJSONWriter:
             start = coordinates[index]
             end = coordinates[index + 1]
 
+            properties = {
+                "segment_id": index,
+                "distance": distances[index],
+                "gradient": gradients[index],
+                "distance_m": distances[index],
+                "gradient_pct": gradients[index],
+                "color": gradient_to_color(gradients[index]),
+            }
+
+            if elevations is not None:
+                properties["elevation_m"] = elevations[index]
+            if difficulty is not None:
+                properties["difficulty"] = difficulty.name
+            if score is not None:
+                properties["score"] = score
+
             features.append(
                 {
                     "type": "Feature",
@@ -109,12 +143,7 @@ class GeoJSONWriter:
                             [end.longitude, end.latitude],
                         ],
                     },
-                    "properties": {
-                        "segment_id": index,
-                        "distance": distances[index],
-                        "gradient": gradients[index],
-                        "color": gradient_to_color(gradients[index]),
-                    },
+                    "properties": properties,
                 }
             )
 

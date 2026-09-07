@@ -144,6 +144,28 @@ The options are:
 - `--json`: optional JSON export path
 - `--output`: optional PNG image output path
 
+### Interactive GIS Export
+
+Use `--interactive` to export the analyzed road segments and a Leaflet HTML map
+to the specified directory.
+
+```bash
+wrgd --interactive output/ \
+    --route data/sample/sample.gpx \
+    --dem data/raw/output_hh.tif
+```
+
+The command generates:
+
+```text
+output/segments.geojson
+output/interactive_map.html
+```
+
+Open `interactive_map.html` in a browser to view the interactive Leaflet map.
+Each segment is colored using its GeoJSON `color` property, and its distance,
+gradient, elevation, difficulty, and score are available in the segment popup.
+
 ### CLI Analysis Example
 
 ```bash

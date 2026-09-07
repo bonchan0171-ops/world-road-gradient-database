@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WRGD Interactive Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    html, body, #map {
+      height: 100%;
+      margin: 0;
+    }
+
+    #map {
+      min-height: 320px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const geojsonData = __GEOJSON_DATA__;
+    const map = L.map("map");
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const formatValue = (value, digits = 2) => {
+      const number = Number(value);
+      return Number.isFinite(number) ? number.toFixed(digits) : "N/A";
+    };
+
+    const propertyValue = (properties, name, fallbackName) =>
+      properties[name] ?? (fallbackName ? properties[fallbackName] : undefined);
+
+    const escapeHtml = (value) => String(value ?? "N/A")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+    const layer = L.geoJSON(geojsonData, {
+      style: (feature) => ({
+        color: feature.properties.color || "#3388ff",
+        weight: 5,
+        opacity: 0.9
+      }),
+      onEachFeature: (feature, featureLayer) => {
+        const properties = feature.properties || {};
+        const distance = propertyValue(properties, "distance_m", "distance");
+        const gradient = propertyValue(properties, "gradient_pct", "gradient");
+
+        const popup = [
+          "<strong>WRGD Segment</strong>",
+          `distance_m: ${formatValue(distance)} m`,
+          `gradient_pct: ${formatValue(gradient)} %`,
+          `elevation_m: ${formatValue(properties.elevation_m)} m`,
+          `difficulty: ${escapeHtml(properties.difficulty)}`,
+          `score: ${formatValue(properties.score)}`
+        ].join("<br>");
+
+        featureLayer.bindPopup(popup);
+      }
+    }).addTo(map);
+
+    if (layer.getBounds().isValid()) {
+      map.fitBounds(layer.getBounds());
+    }
+  </script>
+</body>
+</html>

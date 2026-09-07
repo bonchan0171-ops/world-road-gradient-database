@@ -55,6 +55,28 @@ def run_map(args) -> None:
     print(f"HTML     : {output_path}")
 
 
+def write_interactive_outputs(
+    road_segment,
+    output_dir: Path,
+    difficulty,
+    score: float,
+) -> None:
+    """Write the segment GeoJSON and interactive map to a directory."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    geojson_path = output_dir / "segments.geojson"
+    html_path = output_dir / "interactive_map.html"
+
+    GeoJSONWriter(geojson_path).write_segments(
+        road_segment,
+        difficulty=difficulty,
+        score=score,
+    )
+    export_leaflet_map(
+        geojson_path=str(geojson_path),
+        html_path=str(html_path),
+    )
+
+
 def main() -> None:
     """Run the WRGD command-line interface."""
 
@@ -96,6 +118,12 @@ def main() -> None:
     analyze.add_argument(
         "--output",
         help="Optional output PNG path for the elevation profile image",
+    )
+
+    analyze.add_argument(
+        "--interactive",
+        type=Path,
+        help="Optional directory for interactive map outputs",
     )
 
     map_parser = subparsers.add_parser(
@@ -169,6 +197,14 @@ def main() -> None:
 
         if args.output:
             ElevationProfile(road_segment).save_image(Path(args.output))
+
+        if args.interactive:
+            write_interactive_outputs(
+                road_segment,
+                args.interactive,
+                difficulty,
+                score,
+            )
 
         print("WRGD CLI")
         print(f"Route : {route_file}")

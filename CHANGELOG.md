@@ -7,6 +7,18 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.26.0
+
+### Added
+
+- `--interactive` CLI option for GIS exports
+- Automatic `segments.geojson` generation in the specified output directory
+- Automatic `interactive_map.html` generation with Leaflet
+- README usage example for Interactive GIS Export
+- CLI tests for interactive output paths and export calls
+
+---
+
 ## v0.25.0
 
 ### Added

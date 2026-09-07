@@ -5,6 +5,8 @@ import pytest
 
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.models import Coordinate
+from wrgd.models.difficulty import DifficultyLevel
+from wrgd.road.segment import RoadSegment
 
 
 def test_write_geojson(tmp_path: Path) -> None:
@@ -128,3 +130,30 @@ def test_write_segments_includes_color(tmp_path: Path) -> None:
 
     assert second_properties["gradient"] == 15.0
     assert second_properties["color"] == "#FF0000"
+
+
+def test_write_segments_includes_standard_properties(tmp_path: Path) -> None:
+    output = tmp_path / "segments.geojson"
+    road_segment = RoadSegment(
+        coordinates=[(35.0, 135.0), (35.1, 135.1)],
+        elevations=[10.0, 12.0],
+        distances=[100.0],
+        gradients=[2.0],
+    )
+
+    GeoJSONWriter(output).write_segments(
+        road_segment,
+        difficulty=DifficultyLevel(level=2, name="普通", score=42.0),
+        score=42.0,
+    )
+
+    properties = json.loads(output.read_text(encoding="utf-8"))["features"][0][
+        "properties"
+    ]
+
+    assert properties["distance_m"] == 100.0
+    assert properties["gradient_pct"] == 2.0
+    assert properties["elevation_m"] == 10.0
+    assert properties["color"] == "#22DD00"
+    assert properties["difficulty"] == "普通"
+    assert properties["score"] == 42.0
