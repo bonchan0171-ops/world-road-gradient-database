@@ -160,6 +160,32 @@ Evaluation Score  : 3.3
 
 ---
 
+## Interactive Map
+
+Generate an interactive HTML gradient heatmap directly from a GPX route.
+
+```bash
+wrgd map \
+  --route data/sample/sample.gpx \
+  --dem data/raw/output_hh.tif \
+  --output output/gradient_map.html
+```
+
+Output:
+
+- `output/gradient_map.html`
+- `output/segments.geojson`
+
+Open `gradient_map.html` in your browser to explore the route with:
+
+- Gradient heatmap
+- Interactive segment popup
+- Gradient legend
+- Offline standalone HTML
+```
+
+---
+
 ## Example Generated Outputs
 
 When you run the CLI with `--csv`, `--json`, and `--output`, WRGD can generate the following files:

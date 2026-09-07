@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import rasterio.errors
@@ -16,9 +17,42 @@ from wrgd.app import (
 )
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
+from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.io.json_writer import write_json
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
+from wrgd.visualization.leaflet import export_leaflet_map
+
+
+def run_map(args) -> None:
+    output_path = Path(args.output)
+    output_dir = output_path.parent
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    geojson_path = output_dir / "segments.geojson"
+
+    coordinates = load_route(Path(args.route))
+    builder_coordinates = to_builder_coordinates(coordinates)
+
+    dem_loader = DEMLoader(Path(args.dem))
+    dem_loader.load()
+
+    road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+
+    writer = GeoJSONWriter(geojson_path)
+    writer.write_segments(road_segment)
+
+    export_leaflet_map(
+        geojson_path=str(geojson_path),
+        html_path=str(output_path),
+    )
+
+    print("WRGD Interactive Map")
+    print("====================")
+    print(f"Route    : {args.route}")
+    print(f"DEM      : {args.dem}")
+    print(f"Segments : {len(road_segment.segments)}")
+    print(f"HTML     : {output_path}")
 
 
 def main() -> None:
@@ -28,35 +62,64 @@ def main() -> None:
         prog="wrgd",
         description="World Road Geometry Database",
     )
+    subparsers = parser.add_subparsers(
+        dest="command",
+        required=True,
+    )
+    analyze = subparsers.add_parser(
+        "analyze",
+        help="Analyze a route",
+    )
 
-    parser.add_argument(
+    analyze.add_argument(
         "--route",
         required=True,
         help="Route file (.gpx or .geojson)",
     )
 
-    parser.add_argument(
+    analyze.add_argument(
         "--dem",
         required=True,
         help="DEM file (.tif)",
     )
 
-    parser.add_argument(
+    analyze.add_argument(
         "--csv",
         help="Optional output CSV path for road statistics",
     )
 
-    parser.add_argument(
+    analyze.add_argument(
         "--json",
         help="Optional output JSON path for road statistics",
     )
 
-    parser.add_argument(
+    analyze.add_argument(
         "--output",
         help="Optional output PNG path for the elevation profile image",
     )
 
-    args = parser.parse_args()
+    map_parser = subparsers.add_parser(
+        "map",
+        help="Generate interactive Leaflet map",
+    )
+
+    map_parser.add_argument("--route", required=True)
+    map_parser.add_argument("--dem", required=True)
+    map_parser.add_argument(
+        "--output",
+        default="output/gradient_map.html",
+        help="Output HTML path",
+    )
+
+    argv = sys.argv[1:]
+    if argv and argv[0].startswith("-"):
+        argv = ["analyze", *argv]
+
+    args = parser.parse_args(argv)
+
+    if args.command == "map":
+        run_map(args)
+        return
 
     route_file = Path(args.route)
     dem_file = Path(args.dem)

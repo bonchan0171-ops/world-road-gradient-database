@@ -7,6 +7,20 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.25.0
+
+### Added
+
+- `wrgd analyze` subcommand (backward compatible)
+- `wrgd map` interactive map CLI
+- Automatic Segment GeoJSON generation
+- Automatic Leaflet HTML generation
+- Offline standalone HTML map
+- Interactive segment popup
+- CLI map integration tests
+
+---
+
 ## v0.24.1
 
 ### Added
