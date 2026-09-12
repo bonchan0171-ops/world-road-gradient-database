@@ -33,6 +33,7 @@ WRGD currently supports:
 - Road difficulty evaluation (5 levels)
 - Road evaluation score (0–100)
 - Segment-based GeoJSON export for GIS
+- GeoPackage export for GIS and SQL workflows
 - Gradient-based color attributes for GeoJSON visualization
 ---
 
@@ -133,7 +134,8 @@ The installed CLI accepts a route file, a DEM file, and optional export paths.
 wrgd --route data/sample/sample.gpx --dem data/raw/output_hh.tif \
   --csv output/road_statistics.csv \
   --json output/road_statistics.json \
-  --output output/elevation_profile.png
+    --output output/elevation_profile.png \
+    --gpkg output/segments.gpkg
 ```
 
 The options are:
@@ -143,6 +145,7 @@ The options are:
 - `--csv`: optional CSV export path
 - `--json`: optional JSON export path
 - `--output`: optional PNG image output path
+- `--gpkg`: optional GeoPackage output path for road segments
 
 ### Interactive GIS Export
 
@@ -161,6 +164,20 @@ output/interactive_map.html
 ```
 
 Open `interactive_map.html` in a browser to view the interactive Leaflet map.
+
+### GeoPackage Export
+
+Use `--gpkg` to export the analyzed road segments as an OGC GeoPackage.
+The output contains the `road_segments` layer with EPSG:4326 geometry,
+distance, gradient, elevation, difficulty, score, and color attributes.
+
+```bash
+wrgd --route sample.gpx --dem data/raw/output_hh.tif --gpkg output/segments.gpkg
+```
+
+The generated `output/segments.gpkg` can be opened directly in QGIS or other
+GeoPackage-compatible GIS software. The `road_segments` layer can be styled
+using the `gradient_pct` or `color` attribute.
 Click a road segment to open a Leaflet popup containing its distance, gradient,
 elevation, difficulty, and score.
 
@@ -264,6 +281,36 @@ Each road segment contains the following properties:
 The `color` property is a hexadecimal RGB color derived from the road gradient.
 
 The generated GeoJSON can be loaded into QGIS or other GIS software and the `color` attribute can be used for road gradient visualization.
+
+## GeoPackage Python API
+
+`GeoPackageWriter` writes the segments and attributes already calculated in a
+`RoadSegment`. It does not recalculate distance or gradient values.
+
+```python
+from pathlib import Path
+
+from wrgd.app import load_route, to_builder_coordinates
+from wrgd.io.dem_loader import DEMLoader
+from wrgd.io.gpkg_writer import GeoPackageWriter
+from wrgd.road.builder import RoadSegmentBuilder
+
+route_file = Path("data/sample/sample.gpx")
+dem_file = Path("data/raw/output_hh.tif")
+output_file = Path("output/segments.gpkg")
+
+coordinates = load_route(route_file)
+builder_coordinates = to_builder_coordinates(coordinates)
+
+dem_loader = DEMLoader(dem_file)
+dem_loader.load()
+
+road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+GeoPackageWriter(output_file).write_segments(road_segment)
+```
+
+The resulting GeoPackage can be opened in QGIS. Its `road_segments` layer uses
+`LineString` geometries with coordinates stored as longitude and latitude.
 
 
 ## API Examples

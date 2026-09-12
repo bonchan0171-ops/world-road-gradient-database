@@ -219,3 +219,93 @@ def test_cli_writes_interactive_outputs_when_option_is_given(tmp_path) -> None:
                 geojson_path=str(geojson_path),
                 html_path=str(html_path),
             )
+
+
+def test_cli_writes_gpkg_when_option_is_given(tmp_path: Path) -> None:
+    """CLI should export road segments to GeoPackage when requested."""
+
+    gpkg_path = tmp_path / "nested" / "segments.gpkg"
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--route",
+            "tests/data/sample.geojson",
+            "--dem",
+            "sample.tif",
+            "--gpkg",
+            str(gpkg_path),
+        ],
+    ):
+        with (
+            patch("pathlib.Path.exists", return_value=True),
+            patch(
+                "wrgd.cli.load_route",
+                return_value=[],
+            ),
+            patch("wrgd.cli.to_builder_coordinates", return_value=[]),
+            patch("wrgd.cli.DEMLoader") as mock_dem_loader,
+            patch("wrgd.cli.RoadSegmentBuilder") as mock_builder,
+            patch("wrgd.cli.GeoPackageWriter") as mock_writer_class,
+        ):
+            mock_dem_loader.return_value
+            mock_segment = mock_builder.return_value.build.return_value
+            mock_segment.statistics.return_value = RoadStatistics(
+                distance=0.0,
+                ascent=0.0,
+                descent=0.0,
+                highest_elevation=0.0,
+                lowest_elevation=0.0,
+                max_gradient=0.0,
+                average_gradient=0.0,
+            )
+
+            main()
+
+            assert gpkg_path.parent.exists()
+            mock_writer_class.assert_called_once_with(gpkg_path)
+            mock_writer_class.return_value.write_segments.assert_called_once_with(
+                mock_segment,
+                difficulty=mock.ANY,
+                score=mock.ANY,
+            )
+
+
+def test_cli_does_not_write_gpkg_without_option() -> None:
+    """CLI should not create a GeoPackage unless requested."""
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--route",
+            "tests/data/sample.geojson",
+            "--dem",
+            "sample.tif",
+        ],
+    ):
+        with (
+            patch("pathlib.Path.exists", return_value=True),
+            patch(
+                "wrgd.cli.load_route",
+                return_value=[],
+            ),
+            patch("wrgd.cli.to_builder_coordinates", return_value=[]),
+            patch("wrgd.cli.DEMLoader"),
+            patch("wrgd.cli.RoadSegmentBuilder") as mock_builder,
+            patch("wrgd.cli.GeoPackageWriter") as mock_writer_class,
+        ):
+            mock_segment = mock_builder.return_value.build.return_value
+            mock_segment.statistics.return_value = RoadStatistics(
+                distance=0.0,
+                ascent=0.0,
+                descent=0.0,
+                highest_elevation=0.0,
+                lowest_elevation=0.0,
+                max_gradient=0.0,
+                average_gradient=0.0,
+            )
+
+            main()
+
+            mock_writer_class.assert_not_called()

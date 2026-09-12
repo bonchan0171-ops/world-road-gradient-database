@@ -7,6 +7,19 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.27.0
+
+### Added
+
+- GeoPackage export with the `GeoPackageWriter` API
+- `--gpkg` CLI option for exporting the `road_segments` layer
+- EPSG:4326 LineString geometries with longitude/latitude coordinate order
+- GeoPackage attributes for distance, gradient, elevation, difficulty, score, and color
+- GeoPackage Writer and CLI integration tests
+- README usage examples for CLI, Python API, and QGIS
+
+---
+
 ## v0.26.0
 
 ### Added

@@ -18,6 +18,7 @@ from wrgd.app import (
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
+from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.io.json_writer import write_json
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
@@ -126,6 +127,12 @@ def main() -> None:
         help="Optional directory for interactive map outputs",
     )
 
+    analyze.add_argument(
+        "--gpkg",
+        type=Path,
+        help="Optional output GeoPackage path for road segments",
+    )
+
     map_parser = subparsers.add_parser(
         "map",
         help="Generate interactive Leaflet map",
@@ -204,6 +211,14 @@ def main() -> None:
                 args.interactive,
                 difficulty,
                 score,
+            )
+
+        if args.gpkg:
+            args.gpkg.parent.mkdir(parents=True, exist_ok=True)
+            GeoPackageWriter(args.gpkg).write_segments(
+                road_segment,
+                difficulty=difficulty,
+                score=int(score),
             )
 
         print("WRGD CLI")
