@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from wrgd.geometry.curvature import analyze_curvature
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.models import Coordinate
 from wrgd.models.difficulty import DifficultyLevel
@@ -157,3 +158,28 @@ def test_write_segments_includes_standard_properties(tmp_path: Path) -> None:
     assert properties["color"] == "#22DD00"
     assert properties["difficulty"] == "普通"
     assert properties["score"] == 42.0
+
+
+def test_write_segments_includes_curvature_properties(tmp_path: Path) -> None:
+    output = tmp_path / "segments.geojson"
+    road_segment = RoadSegment(
+        coordinates=[(0.0, 0.0), (0.0, 0.001), (0.001, 0.001)],
+        elevations=[10.0, 10.0, 10.0],
+        distances=[111.2, 111.2],
+        gradients=[0.0, 0.0],
+    )
+
+    GeoJSONWriter(output).write_segments(
+        road_segment,
+        curvature_results=analyze_curvature(road_segment.coordinates),
+    )
+
+    properties = json.loads(output.read_text(encoding="utf-8"))["features"][0][
+        "properties"
+    ]
+
+    assert properties["turn_angle_deg"] == pytest.approx(90.0)
+    assert properties["radius_m"] == pytest.approx(78.6, rel=0.01)
+    assert properties["curvature_per_m"] == pytest.approx(1 / properties["radius_m"])
+    assert properties["turn_direction"] == "left"
+    assert properties["is_sharp_curve"] is True

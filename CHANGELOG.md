@@ -7,6 +7,18 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.28.0
+
+### Added
+
+- Three-point road curvature analysis with local metre coordinate conversion
+- `CurvatureResult`, `calculate_turn_angle()`, `calculate_curvature()`, and `analyze_curvature()` APIs
+- Curvature statistics in `RoadStatistics`: average curvature, maximum curvature, minimum radius, and Sharp Curve count
+- Optional curvature attributes for GeoJSON and GeoPackage segment output
+- README documentation and Python API example for road curvature analysis
+
+---
+
 ## v0.27.0
 
 ### Added

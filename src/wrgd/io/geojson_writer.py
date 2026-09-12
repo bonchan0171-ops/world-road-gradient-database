@@ -5,8 +5,10 @@ GeoJSON writer.
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 from pathlib import Path
 
+from wrgd.geometry.curvature import CurvatureResult
 from wrgd.models import Coordinate
 from wrgd.models.difficulty import DifficultyLevel
 from wrgd.road.segment import RoadSegment
@@ -85,6 +87,7 @@ class GeoJSONWriter:
         distances: list[float] | None = None,
         difficulty: DifficultyLevel | None = None,
         score: float | None = None,
+        curvature_results: Sequence[CurvatureResult] | None = None,
     ) -> None:
         """Write each road segment as an individual GeoJSON Feature."""
 
@@ -111,6 +114,9 @@ class GeoJSONWriter:
         if len(distances) != len(coordinates) - 1:
             raise ValueError("Distance count does not match segment count.")
 
+        curvature_by_segment = {
+            result.segment_index: result for result in curvature_results or []
+        }
         features = []
 
         for index in range(len(gradients)):
@@ -132,6 +138,17 @@ class GeoJSONWriter:
                 properties["difficulty"] = difficulty.name
             if score is not None:
                 properties["score"] = score
+            curvature = curvature_by_segment.get(index)
+            if curvature is not None:
+                properties.update(
+                    {
+                        "turn_angle_deg": curvature.turn_angle_deg,
+                        "radius_m": curvature.radius_m,
+                        "curvature_per_m": curvature.curvature_per_m,
+                        "turn_direction": curvature.turn_direction,
+                        "is_sharp_curve": curvature.is_sharp_curve,
+                    }
+                )
 
             features.append(
                 {

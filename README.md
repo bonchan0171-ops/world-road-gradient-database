@@ -126,6 +126,73 @@ This returns a JSON-serializable structure with distance and elevation data.
 
 ---
 
+## Road Curvature Analysis
+
+WRGD can analyze the horizontal curvature of a road centerline using consecutive
+three-point windows. The analysis returns the turn angle, curve radius, curvature,
+turn direction, and Sharp Curve classification for each window.
+
+```python
+from pathlib import Path
+
+from wrgd.analysis.statistics import calculate_statistics
+from wrgd.app import load_route, to_builder_coordinates
+from wrgd.geometry.curvature import analyze_curvature
+from wrgd.io.dem_loader import DEMLoader
+from wrgd.io.geojson_writer import GeoJSONWriter
+from wrgd.io.gpkg_writer import GeoPackageWriter
+from wrgd.profile import ElevationProfile
+from wrgd.road.builder import RoadSegmentBuilder
+
+route_file = Path("data/sample/sample.gpx")
+dem_file = Path("data/raw/output_hh.tif")
+
+coordinates = load_route(route_file)
+builder_coordinates = to_builder_coordinates(coordinates)
+
+dem_loader = DEMLoader(dem_file)
+dem_loader.load()
+road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+
+curvature_results = analyze_curvature(road_segment.coordinates)
+statistics = calculate_statistics(ElevationProfile(road_segment))
+
+print(statistics.average_curvature)
+print(statistics.max_curvature)
+print(statistics.min_radius)
+print(statistics.sharp_curve_count)
+
+GeoJSONWriter("output/segments.geojson").write_segments(
+    road_segment,
+    curvature_results=curvature_results,
+)
+GeoPackageWriter("output/segments.gpkg").write_segments(
+    road_segment,
+    curvature_results=curvature_results,
+)
+```
+
+`analyze_curvature()` uses local metre coordinates for the calculation. The
+results can be passed to both `GeoJSONWriter` and `GeoPackageWriter` through the
+`curvature_results` argument. When curvature results are not supplied, existing
+output remains unchanged.
+
+The following curvature attributes are written for a segment when a matching
+curvature result is supplied:
+
+| Attribute | Unit / value |
+|---|---|
+| `turn_angle_deg` | Turn angle in degrees |
+| `radius_m` | Curve radius in metres |
+| `curvature_per_m` | Curvature in 1/metre |
+| `turn_direction` | `left`, `right`, or `straight` |
+| `is_sharp_curve` | Sharp Curve classification |
+
+`calculate_statistics()` also provides the aggregate curvature values
+`average_curvature`, `max_curvature`, `min_radius`, and `sharp_curve_count`.
+
+---
+
 ## CLI Usage Example
 
 The installed CLI accepts a route file, a DEM file, and optional export paths.

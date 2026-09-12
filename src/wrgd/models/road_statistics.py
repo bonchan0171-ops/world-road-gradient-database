@@ -12,3 +12,7 @@ class RoadStatistics:
     lowest_elevation: float
     max_gradient: float
     average_gradient: float
+    average_curvature: float = 0.0
+    max_curvature: float = 0.0
+    min_radius: float = float("inf")
+    sharp_curve_count: int = 0

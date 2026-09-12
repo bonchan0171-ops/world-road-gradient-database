@@ -1,5 +1,7 @@
 """Tests for WRGD statistics utilities."""
 
+from math import isinf
+
 import pytest
 
 from wrgd.analysis.statistics import calculate_statistics
@@ -35,6 +37,31 @@ def test_calculate_statistics_from_elevation_profile() -> None:
     assert statistics.lowest_elevation == 100.0
     assert statistics.max_gradient == 30.0
     assert statistics.average_gradient == pytest.approx(13.3333333333)
+    assert statistics.average_curvature == 0.0
+    assert statistics.max_curvature == 0.0
+    assert isinf(statistics.min_radius)
+    assert statistics.sharp_curve_count == 0
+
+
+def test_calculate_statistics_includes_curvature() -> None:
+    """calculate_statistics should include three-point curvature statistics."""
+    segment = RoadSegment(
+        coordinates=[
+            (0.0, 0.0),
+            (0.0, 0.001),
+            (0.001, 0.001),
+        ],
+        elevations=[100.0, 100.0, 100.0],
+        distances=[111.2, 111.2],
+        gradients=[0.0, 0.0],
+    )
+
+    statistics = calculate_statistics(ElevationProfile(segment))
+
+    assert statistics.average_curvature == pytest.approx(1.0 / statistics.min_radius)
+    assert statistics.max_curvature == pytest.approx(statistics.average_curvature)
+    assert statistics.min_radius == pytest.approx(78.6, rel=0.01)
+    assert statistics.sharp_curve_count == 1
 
 
 def test_calculate_statistics_raises_for_insufficient_profile_points() -> None:

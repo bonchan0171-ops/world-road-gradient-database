@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import sqlite3
 import struct
+from collections.abc import Sequence
 from datetime import datetime, timezone
 from pathlib import Path
 
+from wrgd.geometry.curvature import CurvatureResult
 from wrgd.models.difficulty import DifficultyLevel
 from wrgd.road.segment import RoadSegment
 from wrgd.visualization import gradient_to_color
@@ -34,6 +36,7 @@ class GeoPackageWriter:
         *,
         difficulty: DifficultyLevel | None = None,
         score: int | None = None,
+        curvature_results: Sequence[CurvatureResult] | None = None,
     ) -> None:
         """Write one ``LineString`` feature for each road segment."""
         if not isinstance(road_segment, RoadSegment):
@@ -46,7 +49,13 @@ class GeoPackageWriter:
 
         with sqlite3.connect(self.filepath) as connection:
             self._create_schema(connection)
-            self._insert_segments(connection, road_segment, difficulty, score)
+            self._insert_segments(
+                connection,
+                road_segment,
+                difficulty,
+                score,
+                curvature_results,
+            )
 
     def _create_schema(self, connection: sqlite3.Connection) -> None:
         connection.execute("PRAGMA application_id = 1196444487")
@@ -101,6 +110,11 @@ class GeoPackageWriter:
                 difficulty TEXT,
                 score INTEGER,
                 color TEXT NOT NULL,
+                turn_angle_deg REAL,
+                radius_m REAL,
+                curvature_per_m REAL,
+                turn_direction TEXT,
+                is_sharp_curve BOOLEAN,
                 geom BLOB NOT NULL
             );
             """)
@@ -184,7 +198,11 @@ class GeoPackageWriter:
         road_segment: RoadSegment,
         difficulty: DifficultyLevel | None,
         score: int | None,
+        curvature_results: Sequence[CurvatureResult] | None,
     ) -> None:
+        curvature_by_segment = {
+            result.segment_index: result for result in curvature_results or []
+        }
         rows = []
         for index, (start, end) in enumerate(
             zip(road_segment.coordinates[:-1], road_segment.coordinates[1:])
@@ -192,6 +210,7 @@ class GeoPackageWriter:
             start_latitude, start_longitude = start
             end_latitude, end_longitude = end
             gradient = road_segment.gradients[index]
+            curvature = curvature_by_segment.get(index)
             rows.append(
                 (
                     index,
@@ -201,6 +220,11 @@ class GeoPackageWriter:
                     difficulty.name if difficulty is not None else None,
                     int(score) if score is not None else None,
                     gradient_to_color(gradient),
+                    curvature.turn_angle_deg if curvature is not None else None,
+                    curvature.radius_m if curvature is not None else None,
+                    curvature.curvature_per_m if curvature is not None else None,
+                    curvature.turn_direction if curvature is not None else None,
+                    int(curvature.is_sharp_curve) if curvature is not None else None,
                     self._encode_linestring(
                         start_longitude,
                         start_latitude,
@@ -220,8 +244,13 @@ class GeoPackageWriter:
                 difficulty,
                 score,
                 color,
+                     turn_angle_deg,
+                     radius_m,
+                     curvature_per_m,
+                     turn_direction,
+                     is_sharp_curve,
                 geom
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             rows,
         )

@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from wrgd.geometry.curvature import analyze_curvature
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.models.difficulty import DifficultyLevel
@@ -55,6 +56,11 @@ def test_write_segments_creates_gpkg_schema_and_attributes(tmp_path: Path) -> No
         "difficulty": "TEXT",
         "score": "INTEGER",
         "color": "TEXT",
+        "turn_angle_deg": "REAL",
+        "radius_m": "REAL",
+        "curvature_per_m": "REAL",
+        "turn_direction": "TEXT",
+        "is_sharp_curve": "BOOLEAN",
         "geom": "BLOB",
     }
     assert rows == [
@@ -91,6 +97,7 @@ def test_geometry_uses_longitude_latitude_and_epsg4326(tmp_path: Path) -> None:
 
 def test_attributes_match_geojson_values(tmp_path: Path) -> None:
     road_segment = _road_segment()
+    curvature_results = analyze_curvature(road_segment.coordinates)
     difficulty = DifficultyLevel(level=2, name="易しい", score=1.5)
     score = 42
     gpkg_output = tmp_path / "segments.gpkg"
@@ -100,17 +107,20 @@ def test_attributes_match_geojson_values(tmp_path: Path) -> None:
         road_segment,
         difficulty=difficulty,
         score=score,
+        curvature_results=curvature_results,
     )
     GeoJSONWriter(geojson_output).write_segments(
         road_segment,
         difficulty=difficulty,
         score=score,
+        curvature_results=curvature_results,
     )
 
     with sqlite3.connect(gpkg_output) as connection:
         gpkg_rows = connection.execute("""
             SELECT segment_id, distance_m, gradient_pct, elevation_m,
-                   difficulty, score, color
+                     difficulty, score, color, turn_angle_deg, radius_m,
+                     curvature_per_m, turn_direction, is_sharp_curve
             FROM road_segments
             ORDER BY segment_id
             """).fetchall()
@@ -124,6 +134,11 @@ def test_attributes_match_geojson_values(tmp_path: Path) -> None:
             feature["properties"]["difficulty"],
             feature["properties"]["score"],
             feature["properties"]["color"],
+            feature["properties"].get("turn_angle_deg"),
+            feature["properties"].get("radius_m"),
+            feature["properties"].get("curvature_per_m"),
+            feature["properties"].get("turn_direction"),
+            feature["properties"].get("is_sharp_curve"),
         )
         for feature in json.loads(geojson_output.read_text(encoding="utf-8"))[
             "features"
@@ -132,6 +147,8 @@ def test_attributes_match_geojson_values(tmp_path: Path) -> None:
 
     assert gpkg_rows == geojson_rows
     assert all(isinstance(row[5], int) for row in gpkg_rows)
+    assert gpkg_rows[0][7] == pytest.approx(curvature_results[0].turn_angle_deg)
+    assert gpkg_rows[0][10] == curvature_results[0].turn_direction
 
 
 def test_writer_accepts_only_road_segment(tmp_path: Path) -> None:
