@@ -774,9 +774,146 @@ pytest --cov=src --cov-report=term-missing
 | Sprint 10 | ✅ GPX Elevation Support |
 | Sprint 11 | ✅ Demo Application |
 | Sprint 12 | ✅ CLI & Application Refactoring |
+| Sprint 13 | ✅ Statistics API |
+| Sprint 14 | ✅ Road Statistics Integration |
+| Sprint 15 | ✅ src Layout Migration |
+| Sprint 16 | ✅ Packaging & CLI |
+| Sprint 17 | ✅ CSV / JSON Export |
+| Sprint 18 | ✅ Elevation Profile |
+| Sprint 19 | ✅ PyPI Preparation |
+| Sprint 20 | ✅ PyPI Release |
+| Sprint 21 | ✅ Analysis API |
+| Sprint 22 | ✅ Difficulty & Score |
+| Sprint 23 | ✅ Geo Heatmap |
+| Sprint 24 | ✅ Segment GeoJSON |
+| Sprint 25 | ✅ Interactive GIS Foundation |
+| Sprint 26 | ✅ Interactive GIS Export |
+| Sprint 27 | ✅ GeoPackage Export |
+| Sprint 28 | ✅ Road Curvature Analysis |
 ---
 
 # Version History
+
+## v0.28.0
+
+### Added
+
+- Three-point road curvature analysis
+- Curvature statistics in `RoadStatistics`
+- Optional curvature attributes for GeoJSON and GeoPackage output
+
+## v0.27.0
+
+### Added
+
+- `GeoPackageWriter` and `--gpkg` export support
+- EPSG:4326 GeoPackage `LineString` geometries
+- GeoPackage attributes for road analysis results
+
+## v0.26.0
+
+### Added
+
+- `--interactive` GIS export option
+- Leaflet interactive map output
+- Interactive segment popups and related CLI tests
+
+## v0.25.0
+
+### Added
+
+- `wrgd analyze` subcommand
+- `wrgd map` interactive map CLI
+- Offline standalone Leaflet map output
+- Segment-based GeoJSON generation
+
+## v0.24.1
+
+### Added
+
+- Interactive Leaflet map export
+- Embedded GeoJSON for offline map viewing
+- Gradient legend and segment popup
+
+## v0.24.0
+
+### Added
+
+- No independent release tag recorded in project history
+- No independent Added entries recorded in `CHANGELOG.md`
+- Changes are documented under v0.24.1 for this release boundary
+
+## v0.23.0
+
+### Added
+
+- Geo Heatmap support for segment GeoJSON
+- `gradient_to_color()` and automatic `color` properties
+- Visualization package and GeoJSON color tests
+
+## v0.22.0
+
+### Added
+
+- Road difficulty and evaluation score in the CLI
+- Difficulty and score fields in CSV/JSON output
+- Feature properties and segment-by-segment GeoJSON output
+
+## v0.21.0
+
+### Added
+
+- `DifficultyLevel` and `RoadStatistics` models
+- `wrgd.analysis` package
+- Difficulty and score calculation tests
+
+## v0.20.0
+
+### Added
+
+- `calculate_statistics()`, `calculate_difficulty()`, and `calculate_score()`
+- CSV and JSON export support
+- Elevation profile PNG export
+
+## v0.19.0
+
+### Added
+
+- PyPI Trusted Publishing workflow
+- Automated GitHub Release publishing
+- Python API and project governance documentation
+
+## v0.18.0
+
+### Added
+
+- CLI CSV export via `--csv`
+- CLI JSON export via `--json`
+- Optional statistics file output
+
+## v0.17.0
+
+### Added
+
+- CLI-enabled road analysis execution
+- Public API entrypoint cleanup
+- CLI error handling and input information display
+
+## v0.16.0
+
+### Added
+
+- No independent release tag recorded in project history
+- No independent Added entries recorded in `CHANGELOG.md`
+- Adjacent release history is recorded under v0.15.0 and v0.17.0
+
+## v0.15.0
+
+### Added
+
+- `RoadStatistics` data model
+- Road statistics fields for distance, elevation, ascent, descent, and gradient
+- Test coverage for the statistics model
 
 ## v0.14.0
 
