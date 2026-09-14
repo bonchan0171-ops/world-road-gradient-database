@@ -7,6 +7,10 @@ from wrgd.geometry.curvature import analyze_curvature
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.models import Coordinate
 from wrgd.models.difficulty import DifficultyLevel
+from wrgd.models.network_edge import NetworkEdge
+from wrgd.models.network_node import NetworkNode
+from wrgd.models.network_path import NetworkPath
+from wrgd.network import RoadNetwork
 from wrgd.road.segment import RoadSegment
 
 
@@ -73,6 +77,83 @@ def test_write_geojson_with_properties(tmp_path) -> None:
 
     assert feature["properties"]["difficulty"] == "普通"
     assert feature["properties"]["score"] == 42.0
+
+
+def test_write_network_path_as_geojson_linestring(tmp_path: Path) -> None:
+    """NetworkPathを既存GeoJSONWriterで1本のLineStringとして出力する。"""
+    output = tmp_path / "network_path.geojson"
+    network = RoadNetwork()
+    nodes = [
+        NetworkNode(1, 35.0, 139.0, None),
+        NetworkNode(2, 35.1, 139.1, None),
+        NetworkNode(3, 35.2, 139.2, None),
+    ]
+    for node in nodes:
+        network.add_node(node)
+
+    network.add_edge(
+        NetworkEdge(
+            id=10,
+            start_node=nodes[0],
+            end_node=nodes[1],
+            distance=100.0,
+            average_gradient=1.0,
+            road_type="primary",
+            oneway=False,
+            geometry=[
+                Coordinate(35.0, 139.0),
+                Coordinate(35.1, 139.1),
+            ],
+        )
+    )
+    network.add_edge(
+        NetworkEdge(
+            id=20,
+            start_node=nodes[1],
+            end_node=nodes[2],
+            distance=200.0,
+            average_gradient=2.0,
+            road_type="primary",
+            oneway=False,
+            geometry=[
+                Coordinate(35.1, 139.1),
+                Coordinate(35.2, 139.2),
+            ],
+        )
+    )
+
+    path = NetworkPath(
+        node_ids=[1, 2, 3],
+        edge_ids=[10, 20],
+        distance=300.0,
+    )
+    coordinates = network.path_coordinates(path)
+
+    GeoJSONWriter(output).write(
+        coordinates,
+        properties={
+            "node_ids": path.node_ids,
+            "edge_ids": path.edge_ids,
+            "distance_m": path.distance,
+        },
+    )
+
+    data = json.loads(output.read_text(encoding="utf-8"))
+    feature = data["features"][0]
+
+    assert data["type"] == "FeatureCollection"
+    assert len(data["features"]) == 1
+    assert feature["geometry"]["type"] == "LineString"
+    assert feature["geometry"]["coordinates"] == [
+        [139.0, 35.0],
+        [139.1, 35.1],
+        [139.2, 35.2],
+    ]
+    assert feature["properties"] == {
+        "node_ids": [1, 2, 3],
+        "edge_ids": [10, 20],
+        "distance_m": 300.0,
+    }
 
 
 def test_write_segments_invalid_lengths(tmp_path) -> None:

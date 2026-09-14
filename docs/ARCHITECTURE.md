@@ -59,6 +59,33 @@ World Road Gradient Database (WRGD) は、長期的な地理空間データエ�
 4. セグメントごとの標高、平均および最大勾配、曲率を計算する。
 5. プロビナンスメタデータとともに生データおよび処理済みデータディレクトリに出力を保存する。
 
+### Network Route GeoJSON
+
+Network Route GeoJSON は、次の流れで処理する。
+
+```text
+OSM XML
+	↓
+RoadNetwork
+	↓
+shortest_route()
+	↓
+NetworkPath
+	↓
+path_coordinates()
+	↓
+GeoJSONWriter
+	↓
+GeoJSON LineString
+```
+
+責務は次のように分離する。
+
+- `RoadNetwork`: 経路探索と座標列生成
+- `NetworkPath`: 経路Node/Edge情報の保持
+- `GeoJSONWriter`: Coordinate列のGeoJSON出力
+- CLI: 入力、経路指定、出力処理の調整
+
 ## プロジェクト構成
 
 - `data/`: 生データおよび処理済みデータの保存。

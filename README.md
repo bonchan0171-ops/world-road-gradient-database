@@ -35,6 +35,13 @@ WRGD currently supports:
 - Segment-based GeoJSON export for GIS
 - GeoPackage export for GIS and SQL workflows
 - Gradient-based color attributes for GeoJSON visualization
+- OSM XML Reader for road network data
+- `RoadNetwork`, `NetworkNode`, `NetworkEdge`, and `NetworkPath` models
+- Dijkstra shortest path search with `shortest_path()` and `shortest_route()`
+- NetworkPath route statistics via `RoadNetwork.calculate_statistics()`
+- `RoadNetwork.path_coordinates()` for continuous route coordinates
+- Network Route GeoJSON CLI with `--start-node` and `--end-node`
+- Network Route mode uses `--output` for GeoJSON output
 ---
 
 ## Installation
@@ -213,6 +220,18 @@ The options are:
 - `--json`: optional JSON export path
 - `--output`: optional PNG image output path
 - `--gpkg`: optional GeoPackage output path for road segments
+
+For a Network Route GeoJSON export, provide the network, start node, end node,
+and output path:
+
+```bash
+wrgd --network roads.osm.xml --start-node 100 --end-node 200 --output route.geojson
+```
+
+Network Route mode converts `NetworkPath` through
+`RoadNetwork.path_coordinates()` and writes the resulting GeoJSON LineString
+with the existing `GeoJSONWriter.write()` API. The `--output` option remains an
+elevation profile PNG path for the normal route analysis mode.
 
 ### Interactive GIS Export
 
@@ -596,7 +615,7 @@ Project responsibilities are separated as follows:
 | GeoJSON | ✅ | ✅ |
 | GPX | ✅ | ✅ |
 | KML | ❌ | ❌ |
-| OpenStreetMap (OSM) | ❌ | ❌ |
+| OpenStreetMap XML (OSM) | ✅ | ❌ |
 
 ---
 
@@ -713,6 +732,16 @@ Example output:
 }
 ```
 
+### NetworkPath GeoJSON Coordinates
+
+Network routes can be converted into a continuous `Coordinate` list and
+written as a GeoJSON LineString using the existing writer:
+
+```python
+coordinates = network.path_coordinates(path)
+GeoJSONWriter(output).write(coordinates, properties=properties)
+```
+
 ## GPX Writer Example
 
 ```python
@@ -790,6 +819,9 @@ pytest --cov=src --cov-report=term-missing
 | Sprint 26 | ✅ Interactive GIS Export |
 | Sprint 27 | ✅ GeoPackage Export |
 | Sprint 28 | ✅ Road Curvature Analysis |
+| Sprint 30 | ✅ Road Network / OSM / DEM Integration |
+| Sprint 31 | ✅ Shortest Path / NetworkPath / Route Statistics |
+| Sprint 32 | ✅ NetworkPath GeoJSON / Network Route CLI |
 ---
 
 # Version History

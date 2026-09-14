@@ -225,9 +225,30 @@ This project follows Semantic Versioning.
 
 ---
 
-## [Unreleased]
+## [Unreleased] - Sprint 31
 
-No unreleased changes.
+### Added
+
+- `RoadNetwork`, `NetworkNode`, and `NetworkEdge` models
+- OSM XML Reader for road network input
+- DEM-based `NetworkNode` elevation assignment
+- `NetworkEdge` gradient calculation from node elevations
+- CLI `--network` option
+- Dijkstra shortest path via `shortest_path()`
+- `NetworkPath` and `shortest_route()` API
+- `RoadStatistics` generation from `NetworkPath`
+- Difficulty / Score API integration tests for NetworkPath statistics
+
+### Sprint 32
+
+#### Added
+
+- `RoadNetwork.path_coordinates()` for continuous NetworkPath coordinates
+- NetworkPath to GeoJSON LineString integration using `GeoJSONWriter.write()`
+- Network Route GeoJSON CLI with `--start-node` and `--end-node`
+- Network Route mode error handling and GeoJSON properties for `node_ids`,
+  `edge_ids`, and `distance_m`
+- GeoJSON integration tests and CLI tests
 
 ---
 

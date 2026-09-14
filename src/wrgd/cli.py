@@ -20,6 +20,7 @@ from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.io.json_writer import write_json
+from wrgd.network import OSMReader
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.visualization.leaflet import export_leaflet_map
@@ -54,6 +55,84 @@ def run_map(args) -> None:
     print(f"DEM      : {args.dem}")
     print(f"Segments : {len(road_segment.segments)}")
     print(f"HTML     : {output_path}")
+
+
+def run_network(args: argparse.Namespace) -> None:
+    """Load an OSM road network and optionally apply DEM elevations."""
+    network_file = Path(args.network)
+
+    has_start_node = args.start_node is not None
+    has_end_node = args.end_node is not None
+
+    if has_start_node != has_end_node:
+        print("Error: --start-node and --end-node must be specified together.")
+        return
+
+    route_mode = has_start_node and has_end_node
+    if route_mode and args.output is None:
+        print("Error: --output is required for Network Route mode.")
+        return
+
+    if route_mode and args.csv:
+        print("Error: --csv is not supported in Network Route mode.")
+        return
+
+    if route_mode and args.json:
+        print("Error: --json is not supported in Network Route mode.")
+        return
+
+    if not network_file.exists():
+        print(f"Error: network file not found: {network_file}")
+        return
+
+    try:
+        network = OSMReader(network_file).read()
+
+        if args.dem:
+            dem_file = Path(args.dem)
+            if not dem_file.exists():
+                print(f"Error: DEM file not found: {dem_file}")
+                return
+
+            dem_loader = DEMLoader(dem_file)
+            dem_loader.load()
+            network.apply_elevation(dem_loader)
+        else:
+            network.apply_elevation()
+
+        if route_mode:
+            path = network.shortest_route(args.start_node, args.end_node)
+            if path is None:
+                print("Error: no route found between the specified nodes.")
+                return
+
+            coordinates = network.path_coordinates(path)
+            GeoJSONWriter(Path(args.output)).write(
+                coordinates,
+                properties={
+                    "node_ids": path.node_ids,
+                    "edge_ids": path.edge_ids,
+                    "distance_m": path.distance,
+                },
+            )
+            print("WRGD Network Route")
+            print(f"Network: {network_file}")
+            print(f"Start  : {args.start_node}")
+            print(f"End    : {args.end_node}")
+            print(f"Output : {args.output}")
+            return
+
+        print("WRGD Road Network")
+        print(f"Network: {network_file}")
+        print(f"Nodes: {network.node_count()}")
+        print(f"Edges: {network.edge_count()}")
+    except (
+        KeyError,
+        ValueError,
+        RuntimeError,
+        rasterio.errors.RasterioIOError,
+    ) as error:
+        print(f"Error: {error}")
 
 
 def write_interactive_outputs(
@@ -94,16 +173,31 @@ def main() -> None:
         help="Analyze a route",
     )
 
-    analyze.add_argument(
+    input_group = analyze.add_mutually_exclusive_group(required=True)
+    input_group.add_argument(
         "--route",
-        required=True,
         help="Route file (.gpx or .geojson)",
+    )
+    input_group.add_argument(
+        "--network",
+        help="OSM road network file (.osm)",
+    )
+
+    analyze.add_argument(
+        "--start-node",
+        type=int,
+        help="Start node ID for Network Route mode",
+    )
+
+    analyze.add_argument(
+        "--end-node",
+        type=int,
+        help="End node ID for Network Route mode",
     )
 
     analyze.add_argument(
         "--dem",
-        required=True,
-        help="DEM file (.tif)",
+        help="DEM file (.tif), required with --route",
     )
 
     analyze.add_argument(
@@ -155,6 +249,13 @@ def main() -> None:
     if args.command == "map":
         run_map(args)
         return
+
+    if args.network:
+        run_network(args)
+        return
+
+    if args.dem is None:
+        parser.error("--dem is required with --route")
 
     route_file = Path(args.route)
     dem_file = Path(args.dem)
