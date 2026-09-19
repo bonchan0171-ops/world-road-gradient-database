@@ -11,9 +11,14 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 
+from wrgd.analysis.statistics import calculate_statistics
+from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_reader import GeoJSONReader
 from wrgd.io.gpx_reader import GPXReader
-from wrgd.models import Coordinate
+from wrgd.models import Coordinate, NetworkPath, RoadStatistics
+from wrgd.network import RoadNetwork
+from wrgd.profile import ElevationProfile
+from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.road.segment import RoadSegment
 
 
@@ -24,6 +29,20 @@ def to_builder_coordinates(
     Convert Coordinate objects to RoadSegmentBuilder format.
     """
     return [(point.latitude, point.longitude) for point in coordinates]
+
+
+def analyze_network_path(
+    network: RoadNetwork,
+    path: NetworkPath,
+    dem_loader: DEMLoader,
+) -> RoadStatistics:
+    """Analyze a NetworkPath with the existing DEM and road statistics flow."""
+    coordinates = network.path_coordinates(path)
+    builder_coordinates = to_builder_coordinates(coordinates)
+    segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
+    profile = ElevationProfile(segment)
+
+    return calculate_statistics(profile)
 
 
 def load_route(path: Path) -> list[Coordinate]:
