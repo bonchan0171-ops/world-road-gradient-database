@@ -100,5 +100,8 @@ jobs:
           python -m examples.segment_geojson
           python -m examples.cli_export_example
 
+      - name: Install build dependency
+        run: python -m pip install build
+
       - name: Build package
         run: python -m build
