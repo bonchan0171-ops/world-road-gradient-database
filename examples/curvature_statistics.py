@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import isfinite
 from pathlib import Path
 
 from wrgd.analysis.statistics import calculate_statistics
@@ -27,10 +28,12 @@ def main() -> None:
 
     results = analyze_curvature(road_segment.coordinates)
     statistics = calculate_statistics(ElevationProfile(road_segment))
+    radii = [result.radius_m for result in results if isfinite(result.radius_m)]
+    average_radius = sum(radii) / len(radii) if radii else None
 
     print(f"Curvature windows: {len(results)}")
     print(f"Minimum radius: {statistics.min_radius}")
-    print(f"Average radius: {statistics.average_radius}")
+    print(f"Average radius: {average_radius}")
     print(f"Sharp curve count: {statistics.sharp_curve_count}")
 
 

@@ -7,6 +7,15 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.30.2
+
+### Fixed
+
+- Fixed `curvature_statistics.py` CI failure caused by referencing the unavailable `RoadStatistics.average_radius` attribute.
+- Calculated average curvature radius from finite `CurvatureResult.radius_m` values while retaining `RoadStatistics.min_radius` for the minimum radius.
+
+---
+
 ## v0.30.1
 
 ### Fixed
