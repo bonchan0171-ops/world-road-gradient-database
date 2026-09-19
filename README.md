@@ -100,6 +100,24 @@ output/elevation_profile.png
 
 `demo.py` is retained as a compatibility entry point for `quickstart.py`.
 
+## Find by Goal
+
+Use this table to find the WRGD feature that matches what you want to do.
+
+| What you want to do | Main feature or API | Example or CLI |
+|---|---|---|
+| Load a GPX route and inspect elevations | `GPXReader`, `DEMLoader`, `RoadSegmentBuilder` | `examples.quickstart` or `wrgd --route ... --dem ...` |
+| Summarize distance, ascent, descent, and gradient | `RoadSegment.statistics()`, `calculate_statistics()` | `examples.python_api_example` or `wrgd --route ... --dem ...` |
+| Analyze sharp curves and curvature | `analyze_curvature()`, `CurvatureResult` | `examples.curvature_statistics` |
+| Find a route through a road network | `OSMReader`, `shortest_route()` | `examples.network_route` or `wrgd --network ...` |
+| Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
+| Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
+| Calculate difficulty and evaluation score | `calculate_difficulty()`, `calculate_score()` | `examples.cli_export_example` or `wrgd ... --csv ... --json ...` |
+| Create an elevation profile image | `ElevationProfile`, `plot_elevation_profile()` | `examples.cli_export_example` or `wrgd ... --output ...` |
+
+For the complete list of Examples and their input requirements, see
+[`examples/README.md`](examples/README.md).
+
 ## Examples
 
 The official Examples are the following seven scripts. Run these commands from
