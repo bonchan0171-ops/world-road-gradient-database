@@ -7,6 +7,28 @@ This project follows Semantic Versioning.
 
 ---
 
+## v1.0.0
+
+### Added
+
+- Stable 1.0.0 API definition based on the documented top-level WRGD exports
+- API Stability Policy and API Freeze documentation for the 1.0.0 public API
+- Purpose-based Feature Navigation with the README `Find by Goal` section
+- OSM fixture-based CI execution for `network_route.py`
+
+### Improved
+
+- Stabilized CI execution for representative Examples without external DEM downloads
+- Synchronized Example inputs, fixtures, documentation, and GitHub Actions workflows
+- Clarified the distinction between the top-level Stable API and advanced Module API
+
+### Quality
+
+- Verified package, Example, OSM fixture, documentation, and CI integration workflows
+- Prepared the v1.0.0 release candidate without promoting development-only API fields
+
+---
+
 ## v0.30.2
 
 ### Fixed
