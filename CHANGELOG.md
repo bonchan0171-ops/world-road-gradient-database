@@ -11,6 +11,14 @@ This project follows Semantic Versioning.
 
 ### Added
 
+### Improved
+
+---
+
+## v1.1.0
+
+### Added
+
 - Documentation for `estimate_radius()`, `classify_curve()`, `CurveCategory`,
     `CurvatureResult.category`, and `RoadStatistics.average_radius`
 - Current curvature radius category thresholds and non-finite radius behavior
