@@ -204,11 +204,51 @@ from wrgd.visualization.leaflet import export_leaflet_map
 
 ### Stable API (1.x Guaranteed)
 
-The top-level package surface and the documented user-facing workflow are considered stable within the 1.x series. These interfaces are meant to remain compatible across minor releases.
+The following top-level exports are the Stable API covered by the 1.x compatibility guarantee:
+
+```text
+Coordinate
+DEMLoader
+NetworkEdge
+NetworkNode
+NetworkPath
+OSMReader
+RoadSegment
+RoadSegmentBuilder
+RoadNetwork
+RoadStatistics
+calculate_statistics
+```
+
+For `RoadStatistics`, the Stable API attributes documented for the v0.30.2
+baseline are:
+
+```text
+distance
+ascent
+descent
+highest_elevation
+lowest_elevation
+max_gradient
+average_curvature
+max_curvature
+min_radius
+sharp_curve_count
+```
+
+These lists describe the interfaces guaranteed for compatibility in the 1.x
+series; they are not a promise that every currently implemented symbol is part
+of the Stable API. In particular, `minimum_radius` and `average_radius` may be
+present in the current implementation, but are not included in the 1.0.0
+Stable API baseline. This leaves room to define their future API contract
+without changing the current compatibility guarantee.
 
 ### Module API (compatibility not guaranteed)
 
-Submodules such as `wrgd.io`, `wrgd.geometry`, `wrgd.analysis`, `wrgd.profile`, and `wrgd.visualization` are provided for advanced usage and may evolve without strict compatibility guarantees.
+Submodules such as `wrgd.io`, `wrgd.geometry`, `wrgd.analysis`, `wrgd.profile`,
+and `wrgd.visualization` are provided for advanced usage and may evolve without
+strict compatibility guarantees. Their current implementation surface must
+not be confused with the top-level Stable API listed above.
 
 ### Semantic Versioning (MAJOR / MINOR / PATCH)
 
