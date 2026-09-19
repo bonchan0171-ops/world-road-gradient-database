@@ -99,6 +99,11 @@ jobs:
           python -m examples.python_api_example
           python -m examples.segment_geojson
           python -m examples.cli_export_example
+          python -m examples.network_route \
+            --network tests/data/sample_network.osm \
+            --start-node 1 \
+            --end-node 3 \
+            --output output/network_route.geojson
 
       - name: Install build dependency
         run: python -m pip install build
