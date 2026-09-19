@@ -7,6 +7,21 @@ This project follows Semantic Versioning.
 
 ---
 
+## Unreleased
+
+### Added
+
+- Documentation for `estimate_radius()`, `classify_curve()`, `CurveCategory`,
+    `CurvatureResult.category`, and `RoadStatistics.average_radius`
+- Current curvature radius category thresholds and non-finite radius behavior
+
+### Improved
+
+- Clarified that curvature helpers belong to the `wrgd.geometry` Module API and
+    are distinct from the top-level Stable API
+
+---
+
 ## v1.0.0
 
 ### Added

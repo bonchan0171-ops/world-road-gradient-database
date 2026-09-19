@@ -329,6 +329,23 @@ print(f"Sharp curve count: {statistics.sharp_curve_count}")
 examples, see `examples/curvature_statistics.py`, `examples/segment_geojson.py`, and
 `examples/cli_export_example.py`.
 
+The curvature helpers are part of the `wrgd.geometry` Module API, not the
+top-level Stable API. `estimate_radius()` calculates a curve radius from three
+points and returns `None` when the points are nearly collinear. `classify_curve()`
+maps a finite radius to a `CurveCategory` using these current thresholds:
+
+| Radius | Category |
+|---|---|
+| $radius \le 30$ m | `SHARP` |
+| $30 < radius < 80$ m | `MEDIUM` |
+| $radius \ge 80$ m | `GENTLE` |
+
+Straight curves and non-finite radii have `CurvatureResult.category = None`.
+`CurvatureResult.category` stores the category returned by `classify_curve()`.
+`RoadStatistics.average_radius` is calculated from finite radius values only;
+it is available in the current implementation but remains part of the Module
+API rather than the top-level Stable API.
+
 The following curvature attributes are written for a segment when a matching
 curvature result is supplied:
 
