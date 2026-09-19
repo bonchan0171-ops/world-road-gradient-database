@@ -41,6 +41,7 @@ def test_calculate_statistics_from_elevation_profile() -> None:
     assert statistics.max_curvature == 0.0
     assert isinf(statistics.min_radius)
     assert statistics.sharp_curve_count == 0
+    assert statistics.average_radius is None
 
 
 def test_calculate_statistics_includes_curvature() -> None:
@@ -62,6 +63,7 @@ def test_calculate_statistics_includes_curvature() -> None:
     assert statistics.max_curvature == pytest.approx(statistics.average_curvature)
     assert statistics.min_radius == pytest.approx(78.6, rel=0.01)
     assert statistics.sharp_curve_count == 1
+    assert statistics.average_radius == pytest.approx(78.6, rel=0.01)
 
 
 def test_calculate_statistics_raises_for_insufficient_profile_points() -> None:

@@ -16,3 +16,4 @@ class RoadStatistics:
     max_curvature: float = 0.0
     min_radius: float = float("inf")
     sharp_curve_count: int = 0
+    average_radius: float | None = None

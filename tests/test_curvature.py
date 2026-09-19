@@ -6,9 +6,12 @@ import pytest
 
 from wrgd.geometry.curvature import (
     CurvatureResult,
+    CurveCategory,
     analyze_curvature,
     calculate_curvature,
     calculate_turn_angle,
+    classify_curve,
+    estimate_radius,
 )
 
 
@@ -70,3 +73,26 @@ def test_duplicate_consecutive_points_raise_value_error() -> None:
 def test_fewer_than_three_points_returns_empty_list() -> None:
     """A coordinate sequence needs three points for one result."""
     assert analyze_curvature([(0.0, 0.0), (0.0, 0.001)]) == []
+
+
+def test_estimate_radius_for_right_angle_curve() -> None:
+    """A right-angle curve should have a finite circumcircle radius."""
+    radius = estimate_radius(
+        (0.0, 0.0),
+        (0.0, 0.001),
+        (0.001, 0.001),
+    )
+
+    assert radius == pytest.approx(78.6, rel=0.01)
+
+
+def test_curve_categories() -> None:
+    """Curve categories should follow the configured radius thresholds."""
+    assert classify_curve(30.0) is CurveCategory.SHARP
+    assert classify_curve(50.0) is CurveCategory.MEDIUM
+    assert classify_curve(80.0) is CurveCategory.GENTLE
+
+
+def test_estimate_radius_returns_none_for_straight_line() -> None:
+    """A straight three-point route has no finite radius."""
+    assert estimate_radius((0.0, 0.0), (0.0, 0.001), (0.0, 0.002)) is None

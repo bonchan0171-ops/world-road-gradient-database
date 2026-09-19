@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from math import inf
+from math import inf, isfinite
 
 from wrgd.geometry.curvature import analyze_curvature
 from wrgd.geometry.gradient import calculate_gradient
@@ -82,7 +82,9 @@ def calculate_statistics(profile: ElevationProfile) -> RoadStatistics:
     average_gradient = sum(gradients) / len(gradients) if gradients else 0.0
     curvature_results = analyze_curvature(profile._segment.coordinates)
     curvatures = [result.curvature_per_m for result in curvature_results]
-    radii = [result.radius_m for result in curvature_results]
+    radii = [
+        result.radius_m for result in curvature_results if isfinite(result.radius_m)
+    ]
 
     return RoadStatistics(
         distance=total_distance,
@@ -96,4 +98,5 @@ def calculate_statistics(profile: ElevationProfile) -> RoadStatistics:
         max_curvature=max(curvatures, default=0.0),
         min_radius=min(radii, default=inf),
         sharp_curve_count=sum(result.is_sharp_curve for result in curvature_results),
+        average_radius=(sum(radii) / len(radii) if radii else None),
     )

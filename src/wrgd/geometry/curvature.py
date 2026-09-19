@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import atan2, cos, degrees, hypot, isfinite, radians
+from enum import Enum
+from math import atan2, cos, degrees, hypot, isfinite, isinf, radians
 from typing import Literal, Sequence
 
 from wrgd.geometry.distance import EARTH_RADIUS
@@ -14,6 +15,16 @@ TurnDirection = Literal["left", "right", "straight"]
 _DEFAULT_MIN_TURN_ANGLE_DEG = 45.0
 _DEFAULT_MAX_RADIUS_M = 100.0
 _COLLINEAR_RELATIVE_TOLERANCE = 1e-12
+SHARP_RADIUS_MAX_M = 30.0
+MEDIUM_RADIUS_MAX_M = 80.0
+
+
+class CurveCategory(Enum):
+    """Road curve category based on the estimated radius in metres."""
+
+    GENTLE = "gentle"
+    MEDIUM = "medium"
+    SHARP = "sharp"
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,6 +37,7 @@ class CurvatureResult:
     curvature_per_m: float
     turn_direction: TurnDirection
     is_sharp_curve: bool
+    category: CurveCategory | None = None
 
 
 def _to_local_meters(
@@ -103,6 +115,38 @@ def calculate_turn_angle(
     return degrees(atan2(abs(cross), dot))
 
 
+def estimate_radius(
+    point1: Coordinate,
+    point2: Coordinate,
+    point3: Coordinate,
+) -> float | None:
+    """Estimate the circumcircle radius for three consecutive coordinates.
+
+    A collinear triplet has an infinite radius and returns ``None``. Duplicate
+    consecutive coordinates raise ``ValueError`` because no direction exists.
+    """
+    vector01, vector12, vector02, cross = _local_vectors(point1, point2, point3)
+    _validate_vectors(vector01, vector12)
+
+    length01 = hypot(*vector01)
+    length12 = hypot(*vector12)
+    if abs(cross) <= _COLLINEAR_RELATIVE_TOLERANCE * length01 * length12:
+        return None
+
+    return (length01 * length12 * hypot(*vector02)) / (2.0 * abs(cross))
+
+
+def classify_curve(radius_m: float | None) -> CurveCategory | None:
+    """Classify a curve radius, returning ``None`` for a straight line."""
+    if radius_m is None or not isfinite(radius_m):
+        return None
+    if radius_m <= SHARP_RADIUS_MAX_M:
+        return CurveCategory.SHARP
+    if radius_m < MEDIUM_RADIUS_MAX_M:
+        return CurveCategory.MEDIUM
+    return CurveCategory.GENTLE
+
+
 def calculate_curvature(
     point1: Coordinate,
     point2: Coordinate,
@@ -133,6 +177,7 @@ def calculate_curvature(
         turn_direction = "left" if cross > 0.0 else "right"
 
     is_sharp_curve = turn_angle_deg >= min_turn_angle_deg and radius_m <= max_radius_m
+    category = classify_curve(None if isinf(radius_m) else radius_m)
 
     return CurvatureResult(
         segment_index=segment_index,
@@ -141,6 +186,7 @@ def calculate_curvature(
         curvature_per_m=curvature_per_m,
         turn_direction=turn_direction,
         is_sharp_curve=is_sharp_curve,
+        category=category,
     )
 
 
