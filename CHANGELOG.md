@@ -9,6 +9,10 @@ This project follows Semantic Versioning.
 
 ## Unreleased
 
+---
+
+## v1.2.0
+
 ### Added
 
 - `wrgd.app.analyze_network_path()` for DEM-backed NetworkPath road analysis
@@ -16,7 +20,7 @@ This project follows Semantic Versioning.
 ### Improved
 
 - Documented the distinction between NetworkPath route finding and DEM-backed
-    Network Route Analysis integration
+  Network Route Analysis integration
 
 ---
 
@@ -25,7 +29,7 @@ This project follows Semantic Versioning.
 ### Added
 
 - Documentation for `estimate_radius()`, `classify_curve()`, `CurveCategory`,
-    `CurvatureResult.category`, and `RoadStatistics.average_radius`
+  `CurvatureResult.category`, and `RoadStatistics.average_radius`
 - Current curvature radius category thresholds and non-finite radius behavior
 
 ### Improved
