@@ -42,6 +42,56 @@ jobs:
       - name: Run Tests with Coverage
         run: pytest --cov=src --cov-report=term-missing --cov-fail-under=95
 
+      - name: Generate deterministic DEM fixture
+        run: |
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          import numpy as np
+          import rasterio
+          from rasterio.transform import from_bounds
+
+          project_root = Path.cwd()
+          route_path = project_root / "data" / "sample" / "sample.gpx"
+          dem_path = project_root / "data" / "raw" / "output_hh.tif"
+          namespace = {"gpx": "http://www.topografix.com/GPX/1/1"}
+          root = ET.parse(route_path).getroot()
+          points = [
+              (float(point.attrib["lat"]), float(point.attrib["lon"]))
+              for point in root.findall(".//gpx:trkpt", namespace)
+          ]
+
+          if not points:
+              raise RuntimeError(f"No track points found in {route_path}")
+
+          latitudes = [latitude for latitude, _ in points]
+          longitudes = [longitude for _, longitude in points]
+          margin = 0.001
+          transform = from_bounds(
+              min(longitudes) - margin,
+              min(latitudes) - margin,
+              max(longitudes) + margin,
+              max(latitudes) + margin,
+              1,
+              1,
+          )
+
+          dem_path.parent.mkdir(parents=True, exist_ok=True)
+          profile = {
+              "driver": "GTiff",
+              "width": 1,
+              "height": 1,
+              "count": 1,
+              "dtype": "float32",
+              "crs": "EPSG:4326",
+              "transform": transform,
+          }
+
+          with rasterio.open(dem_path, "w", **profile) as dataset:
+              dataset.write(np.array([[100.0]], dtype=np.float32), 1)
+          PY
+
       - name: Run example scripts
         run: |
           python -m examples.quickstart

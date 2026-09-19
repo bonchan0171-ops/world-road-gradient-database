@@ -98,9 +98,12 @@ This writes:
 output/elevation_profile.png
 ```
 
+`demo.py` is retained as a compatibility entry point for `quickstart.py`.
+
 ## Examples
 
-Run these commands from the repository root after installing WRGD:
+The official Examples are the following seven scripts. Run these commands from
+the repository root after installing WRGD:
 
 ```bash
 python -m examples.quickstart
@@ -113,6 +116,7 @@ python -m examples.network_route \
 python -m examples.python_api_example
 python -m examples.cli_export_example
 python -m examples.interactive_map
+python -m examples.segment_geojson
 ```
 
 - `quickstart.py`: Analyze the sample GPX route with the sample DEM.
@@ -121,6 +125,10 @@ python -m examples.interactive_map
 - `python_api_example.py`: Minimal direct Python API usage.
 - `cli_export_example.py`: CLI export of CSV, JSON, and PNG outputs.
 - `interactive_map.py`: Create a Leaflet map from generated segment GeoJSON.
+- `segment_geojson.py`: Export road segments with gradient and color attributes.
+
+`leaflet_demo.py` and `leaflet_map.py` remain available as lower-level map
+helpers, but are not part of the official Example list.
 
 ---
 
