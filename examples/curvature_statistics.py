@@ -29,7 +29,7 @@ def main() -> None:
     statistics = calculate_statistics(ElevationProfile(road_segment))
 
     print(f"Curvature windows: {len(results)}")
-    print(f"Minimum radius: {statistics.minimum_radius}")
+    print(f"Minimum radius: {statistics.min_radius}")
     print(f"Average radius: {statistics.average_radius}")
     print(f"Sharp curve count: {statistics.sharp_curve_count}")
 

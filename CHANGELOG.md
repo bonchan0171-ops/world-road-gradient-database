@@ -10,9 +10,11 @@ This project follows Semantic Versioning.
 ## v0.30.1
 
 ### Fixed
+
 - Fixed GitHub Actions examples by generating a deterministic DEM fixture during CI.
-- Added curvature_statistics.py, network_route.py, and interactive_map.py as tracked examples.
-- Synchronized README, examples/README, and CI example lists.
+- Added `curvature_statistics.py`, `network_route.py`, and `interactive_map.py` as tracked examples.
+- Synchronized `README`, `examples/README`, and the CI example list.
+- Fixed `curvature_statistics.py` to use the stable `RoadStatistics.min_radius` API.
 
 ---
 
