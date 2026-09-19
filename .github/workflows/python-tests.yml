@@ -41,3 +41,14 @@ jobs:
 
       - name: Run Tests with Coverage
         run: pytest --cov=src --cov-report=term-missing --cov-fail-under=95
+
+      - name: Run example scripts
+        run: |
+          python -m examples.quickstart
+          python -m examples.curvature_statistics
+          python -m examples.python_api_example
+          python -m examples.segment_geojson
+          python -m examples.cli_export_example
+
+      - name: Build package
+        run: python -m build

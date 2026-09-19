@@ -7,6 +7,48 @@ This project follows Semantic Versioning.
 
 ---
 
+## v0.30.0
+
+### Added
+
+- Public API export review for `src/wrgd/__init__.py` and explicit top-level `__all__` documentation
+- README section for the advanced module API and API stability policy
+- CI workflow expansion to execute representative example scripts and build the package after test coverage
+- README examples aligned with the actual `examples/` scripts and duplicate/omitted references resolved
+
+### Improved
+
+- Documentation consistency across README, examples, and package-public API descriptions
+- Validation coverage for example execution and packaging checks in CI
+
+### Quality
+
+- Verified the package entrypoint and documentation remain aligned with the implemented public API
+- Maintained existing Ruff, Black, mypy, and pytest checks without altering the publish workflow
+
+---
+
+## v0.29.0
+
+### Added
+
+- README and example synchronization for public usage patterns and module-level entrypoints
+- Documentation updates covering API stability expectations and the available advanced integrations
+- Example and workflow validation tasks for documentation correctness and release readiness
+
+### Improved
+
+- Consolidated README examples for quick-start, Python API, and analysis workflows
+- Clarified the distinction between stable top-level APIs and lower-level module APIs
+- Updated release-facing documentation to reflect actual package usage and package build validation
+
+### Quality
+
+- Cross-checked examples against the implemented package surface and package metadata
+- Kept CI and packaging checks aligned with the current repository workflow
+
+---
+
 ## v0.28.0
 
 ### Added

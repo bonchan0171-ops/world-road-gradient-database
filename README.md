@@ -98,6 +98,96 @@ This writes:
 output/elevation_profile.png
 ```
 
+## Examples
+
+Run these commands from the repository root after installing WRGD:
+
+```bash
+python -m examples.quickstart
+python -m examples.curvature_statistics
+python -m examples.network_route \
+    --network roads.osm.xml \
+    --start-node 100 \
+    --end-node 200 \
+    --output output/route.geojson
+python -m examples.python_api_example
+python -m examples.cli_export_example
+python -m examples.interactive_map
+```
+
+- `quickstart.py`: Analyze the sample GPX route with the sample DEM.
+- `curvature_statistics.py`: Display radius and sharp-curve statistics.
+- `network_route.py`: Find an OSM shortest route and export it as GeoJSON.
+- `python_api_example.py`: Minimal direct Python API usage.
+- `cli_export_example.py`: CLI export of CSV, JSON, and PNG outputs.
+- `interactive_map.py`: Create a Leaflet map from generated segment GeoJSON.
+
+---
+
+## Advanced Module API
+
+The package exposes several submodules for lower-level integration and custom workflows.
+
+### `wrgd.io`
+
+Input/output helpers for reading and writing GPX, GeoJSON, CSV, JSON, and GeoPackage artifacts.
+
+```python
+from wrgd.io.dem_loader import DEMLoader
+from wrgd.io.geojson_writer import GeoJSONWriter
+```
+
+### `wrgd.geometry`
+
+Geometry utilities for distance, gradient, curvature, and curve classification calculations.
+
+```python
+from wrgd.geometry.curvature import analyze_curvature
+from wrgd.geometry.gradient import calculate_gradient
+```
+
+### `wrgd.analysis`
+
+Analysis helpers for road statistics, difficulty scoring, and aggregate evaluation metrics.
+
+```python
+from wrgd.analysis.statistics import calculate_statistics
+from wrgd.analysis.difficulty import calculate_difficulty
+```
+
+### `wrgd.profile`
+
+Elevation profile models and profile-based computations for road segments.
+
+```python
+from wrgd.profile import ElevationProfile
+```
+
+### `wrgd.visualization`
+
+Visualization utilities for color mapping and exported maps or legends.
+
+```python
+from wrgd.visualization.color import gradient_to_color
+from wrgd.visualization.leaflet import export_leaflet_map
+```
+
+---
+
+## API Stability Policy
+
+### Stable API (1.x Guaranteed)
+
+The top-level package surface and the documented user-facing workflow are considered stable within the 1.x series. These interfaces are meant to remain compatible across minor releases.
+
+### Module API (compatibility not guaranteed)
+
+Submodules such as `wrgd.io`, `wrgd.geometry`, `wrgd.analysis`, `wrgd.profile`, and `wrgd.visualization` are provided for advanced usage and may evolve without strict compatibility guarantees.
+
+### Semantic Versioning (MAJOR / MINOR / PATCH)
+
+WRGD follows semantic versioning: MAJOR for breaking changes, MINOR for backward-compatible features, and PATCH for backward-compatible fixes.
+
 ---
 
 ## Minimal Python API Example
@@ -146,8 +236,6 @@ from wrgd.analysis.statistics import calculate_statistics
 from wrgd.app import load_route, to_builder_coordinates
 from wrgd.geometry.curvature import analyze_curvature
 from wrgd.io.dem_loader import DEMLoader
-from wrgd.io.geojson_writer import GeoJSONWriter
-from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 
@@ -164,25 +252,16 @@ road_segment = RoadSegmentBuilder(dem_loader).build(builder_coordinates)
 curvature_results = analyze_curvature(road_segment.coordinates)
 statistics = calculate_statistics(ElevationProfile(road_segment))
 
-print(statistics.average_curvature)
-print(statistics.max_curvature)
-print(statistics.min_radius)
-print(statistics.sharp_curve_count)
-
-GeoJSONWriter("output/segments.geojson").write_segments(
-    road_segment,
-    curvature_results=curvature_results,
-)
-GeoPackageWriter("output/segments.gpkg").write_segments(
-    road_segment,
-    curvature_results=curvature_results,
-)
+print(f"Curvature windows: {len(curvature_results)}")
+print(f"Average curvature: {statistics.average_curvature}")
+print(f"Max curvature: {statistics.max_curvature}")
+print(f"Min radius: {statistics.min_radius}")
+print(f"Sharp curve count: {statistics.sharp_curve_count}")
 ```
 
-`analyze_curvature()` uses local metre coordinates for the calculation. The
-results can be passed to both `GeoJSONWriter` and `GeoPackageWriter` through the
-`curvature_results` argument. When curvature results are not supplied, existing
-output remains unchanged.
+`analyze_curvature()` uses local metre coordinates for the calculation. For file-output
+examples, see `examples/curvature_statistics.py`, `examples/segment_geojson.py`, and
+`examples/cli_export_example.py`.
 
 The following curvature attributes are written for a segment when a matching
 curvature result is supplied:
@@ -225,7 +304,10 @@ For a Network Route GeoJSON export, provide the network, start node, end node,
 and output path:
 
 ```bash
-wrgd --network roads.osm.xml --start-node 100 --end-node 200 --output route.geojson
+wrgd --network roads.osm.xml \
+    --start-node 100 \
+    --end-node 200 \
+    --output route.geojson
 ```
 
 Network Route mode converts `NetworkPath` through
@@ -693,7 +775,7 @@ This installs the WRGD package in editable mode so the `wrgd` command is availab
 # Quick Start
 
 ```python
-from src.io.geojson_reader import GeoJSONReader
+from wrgd.io.geojson_reader import GeoJSONReader
 
 reader = GeoJSONReader("road.geojson")
 
@@ -745,7 +827,7 @@ GeoJSONWriter(output).write(coordinates, properties=properties)
 ## GPX Writer Example
 
 ```python
-from src.io.gpx_writer import GPXWriter
+from wrgd.io.gpx_writer import GPXWriter
 
 points = [
     (35.681236, 139.767125, 12.3),
