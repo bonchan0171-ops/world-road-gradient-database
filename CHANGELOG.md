@@ -11,7 +11,12 @@ This project follows Semantic Versioning.
 
 ### Added
 
+- `wrgd.app.analyze_network_path()` for DEM-backed NetworkPath road analysis
+
 ### Improved
+
+- Documented the distinction between NetworkPath route finding and DEM-backed
+    Network Route Analysis integration
 
 ---
 
