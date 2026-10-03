@@ -110,6 +110,7 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Summarize distance, ascent, descent, and gradient | `RoadSegment.statistics()`, `calculate_statistics()` | `examples.python_api_example` or `wrgd --route ... --dem ...` |
 | Analyze sharp curves and curvature | `analyze_curvature()`, `CurvatureResult` | `examples.curvature_statistics` |
 | Find a route through a road network | `OSMReader`, `shortest_route()` | `examples.network_route` or `wrgd --network ...` |
+| Summarize road types, bridges, and tunnels on a network route | `wrgd.network.summarize_network_path()`, `NetworkPathSummary` | `examples.network_route` |
 | Analyze a DEM-backed network route with elevation, gradient, and curvature statistics | `wrgd.app.analyze_network_path()` | `RoadNetwork → NetworkPath → analyze_network_path() → RoadStatistics` |
 | Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
@@ -119,6 +120,12 @@ Use this table to find the WRGD feature that matches what you want to do.
 
 For the complete list of Examples and their input requirements, see
 [`examples/README.md`](examples/README.md).
+
+`wrgd.network.summarize_network_path(network, path)` returns a
+`NetworkPathSummary` with the total distance from the path's edges, edge count,
+bridge and tunnel counts, and counts by `road_type`. This Module API is separate
+from `RoadNetwork.calculate_statistics()`, which continues to provide elevation
+and gradient statistics.
 
 For each road edge created by `OSMReader`, OSM `bridge=yes` and `tunnel=yes`
 are exposed as `True` in `NetworkEdge.bridge` and `NetworkEdge.tunnel`,

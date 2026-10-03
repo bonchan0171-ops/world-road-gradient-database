@@ -8,7 +8,7 @@ from wrgd.models.difficulty import DifficultyLevel
 from wrgd.models.network_edge import NetworkEdge
 from wrgd.models.network_node import NetworkNode
 from wrgd.models.network_path import NetworkPath
-from wrgd.network import RoadNetwork
+from wrgd.network import NetworkPathSummary, RoadNetwork, summarize_network_path
 
 
 class FakeDEMLoader:
@@ -149,6 +149,50 @@ def create_path_network(node_count: int) -> tuple[RoadNetwork, list[NetworkNode]
     for node in nodes:
         network.add_node(node)
     return network, nodes
+
+
+def test_summarize_network_path_aggregates_edge_attributes() -> None:
+    """NetworkPathの距離と道路属性をEdgeから集計する。"""
+    network, nodes = create_path_network(4)
+    add_network_edge(network, 10, nodes[0], nodes[1], 10.5)
+    add_network_edge(network, 20, nodes[1], nodes[2], 20.0)
+    add_network_edge(network, 30, nodes[2], nodes[3], 7.5)
+
+    network.get_edge(10).road_type = "primary"
+    network.get_edge(10).bridge = True
+    network.get_edge(20).road_type = "residential"
+    network.get_edge(20).tunnel = True
+    network.get_edge(30).road_type = "primary"
+    network.get_edge(30).bridge = True
+    network.get_edge(30).tunnel = True
+    path = NetworkPath([0, 1, 2, 3], [10, 20, 30], 999.0)
+
+    summary = summarize_network_path(network, path)
+
+    assert isinstance(summary, NetworkPathSummary)
+    assert summary.distance == 38.0
+    assert summary.edge_count == 3
+    assert summary.bridge_count == 2
+    assert summary.tunnel_count == 2
+    assert summary.road_type_counts == {"primary": 2, "residential": 1}
+
+
+def test_summarize_network_path_without_bridges_or_tunnels() -> None:
+    """橋とトンネルがない経路では各件数を0にする。"""
+    network, nodes = create_path_network(3)
+    add_network_edge(network, 10, nodes[0], nodes[1], 12.0)
+    add_network_edge(network, 20, nodes[1], nodes[2], 8.0)
+
+    summary = summarize_network_path(
+        network,
+        NetworkPath([0, 1, 2], [10, 20], 20.0),
+    )
+
+    assert summary.bridge_count == 0
+    assert summary.tunnel_count == 0
+    assert summary.edge_count == 2
+    assert summary.distance == 20.0
+    assert summary.road_type_counts == {"residential": 2}
 
 
 def test_shortest_path_on_a_straight_graph() -> None:

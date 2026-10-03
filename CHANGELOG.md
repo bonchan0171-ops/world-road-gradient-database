@@ -13,6 +13,8 @@ This project follows Semantic Versioning.
 
 - `NetworkEdge.bridge` and `NetworkEdge.tunnel` attributes populated from OSM
   `bridge=yes` and `tunnel=yes` tags
+- `NetworkPathSummary` and `wrgd.network.summarize_network_path()` for network
+  path distance and road-attribute summaries
 
 ---
 
