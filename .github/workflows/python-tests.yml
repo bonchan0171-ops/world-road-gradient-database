@@ -101,6 +101,7 @@ jobs:
           python -m examples.cli_export_example
           python -m examples.network_route \
             --network tests/data/sample_network.osm \
+            --dem data/raw/output_hh.tif \
             --start-node 1 \
             --end-node 3 \
             --output output/network_route.geojson
