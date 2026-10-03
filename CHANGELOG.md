@@ -9,6 +9,11 @@ This project follows Semantic Versioning.
 
 ## Unreleased
 
+### Added
+
+- `NetworkEdge.bridge` and `NetworkEdge.tunnel` attributes populated from OSM
+  `bridge=yes` and `tunnel=yes` tags
+
 ---
 
 ## v1.2.0

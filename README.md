@@ -111,6 +111,7 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Analyze sharp curves and curvature | `analyze_curvature()`, `CurvatureResult` | `examples.curvature_statistics` |
 | Find a route through a road network | `OSMReader`, `shortest_route()` | `examples.network_route` or `wrgd --network ...` |
 | Analyze a DEM-backed network route with elevation, gradient, and curvature statistics | `wrgd.app.analyze_network_path()` | `RoadNetwork → NetworkPath → analyze_network_path() → RoadStatistics` |
+| Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
 | Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
 | Calculate difficulty and evaluation score | `calculate_difficulty()`, `calculate_score()` | `examples.cli_export_example` or `wrgd ... --csv ... --json ...` |
@@ -118,6 +119,11 @@ Use this table to find the WRGD feature that matches what you want to do.
 
 For the complete list of Examples and their input requirements, see
 [`examples/README.md`](examples/README.md).
+
+For each road edge created by `OSMReader`, OSM `bridge=yes` and `tunnel=yes`
+are exposed as `True` in `NetworkEdge.bridge` and `NetworkEdge.tunnel`,
+respectively. Missing tags and other values are `False`. These boolean flags
+complement `road_type` (road classification) and `oneway` (travel direction).
 
 `shortest_route()` finds a `NetworkPath` only. To analyze that path with DEM
 elevations and the existing road statistics pipeline, use
