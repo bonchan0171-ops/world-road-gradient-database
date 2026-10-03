@@ -8,13 +8,20 @@ from pytest import CaptureFixture
 
 from wrgd.app import (
     analyze_network_path,
+    analyze_network_route,
     load_route,
     plot_elevation_profile,
     print_report,
     to_builder_coordinates,
 )
 from wrgd.io.dem_loader import DEMLoader
-from wrgd.models import Coordinate, NetworkEdge, NetworkNode, NetworkPath
+from wrgd.models import (
+    Coordinate,
+    NetworkEdge,
+    NetworkNode,
+    NetworkPath,
+    NetworkRouteAnalysis,
+)
 from wrgd.network import RoadNetwork
 from wrgd.road.segment import RoadSegment
 
@@ -55,6 +62,7 @@ def test_analyze_network_path_returns_road_statistics() -> None:
             average_gradient=0.0,
             road_type="residential",
             oneway=False,
+            bridge=True,
             geometry=[
                 Coordinate(35.7700, 139.7200),
                 Coordinate(35.7700, 139.7210),
@@ -68,8 +76,9 @@ def test_analyze_network_path_returns_road_statistics() -> None:
             end_node=nodes[2],
             distance=100.0,
             average_gradient=0.0,
-            road_type="residential",
+            road_type="primary",
             oneway=False,
+            tunnel=True,
             geometry=[
                 Coordinate(35.7700, 139.7210),
                 Coordinate(35.7710, 139.7210),
@@ -79,12 +88,21 @@ def test_analyze_network_path_returns_road_statistics() -> None:
 
     dem_loader = DEMLoader("tests/data/sample_dem.tif")
     dem_loader.load()
+    path = NetworkPath(node_ids=[1, 2, 3], edge_ids=[10, 20], distance=200.0)
     statistics = analyze_network_path(
         network,
-        NetworkPath(node_ids=[1, 2, 3], edge_ids=[10, 20], distance=200.0),
+        path,
         dem_loader,
     )
+    analysis = analyze_network_route(network, path, dem_loader)
 
+    assert isinstance(analysis, NetworkRouteAnalysis)
+    assert analysis.summary.distance == 200.0
+    assert analysis.summary.edge_count == 2
+    assert analysis.summary.bridge_count == 1
+    assert analysis.summary.tunnel_count == 1
+    assert analysis.summary.road_type_counts == {"residential": 1, "primary": 1}
+    assert analysis.statistics == statistics
     assert statistics.distance > 0.0
     assert isfinite(statistics.min_radius)
     assert statistics.average_radius == pytest.approx(statistics.min_radius)

@@ -15,8 +15,8 @@ from wrgd.analysis.statistics import calculate_statistics
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_reader import GeoJSONReader
 from wrgd.io.gpx_reader import GPXReader
-from wrgd.models import Coordinate, NetworkPath, RoadStatistics
-from wrgd.network import RoadNetwork
+from wrgd.models import Coordinate, NetworkPath, NetworkRouteAnalysis, RoadStatistics
+from wrgd.network import RoadNetwork, summarize_network_path
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.road.segment import RoadSegment
@@ -43,6 +43,17 @@ def analyze_network_path(
     profile = ElevationProfile(segment)
 
     return calculate_statistics(profile)
+
+
+def analyze_network_route(
+    network: RoadNetwork,
+    path: NetworkPath,
+    dem_loader: DEMLoader,
+) -> NetworkRouteAnalysis:
+    """Combine OSM road attributes and DEM-backed path statistics."""
+    summary = summarize_network_path(network, path)
+    statistics = analyze_network_path(network, path, dem_loader)
+    return NetworkRouteAnalysis(summary=summary, statistics=statistics)
 
 
 def load_route(path: Path) -> list[Coordinate]:
