@@ -15,6 +15,8 @@ OSM_XML = """
     <nd ref="3" />
     <tag k="highway" v="primary" />
     <tag k="oneway" v="yes" />
+    <tag k="bridge" v="yes" />
+    <tag k="tunnel" v="yes" />
   </way>
   <way id="200">
     <nd ref="3" />
@@ -64,6 +66,8 @@ def test_edge_attributes_are_converted(tmp_path):
     assert edge.end_node.id == 2
     assert edge.road_type == "primary"
     assert edge.oneway is True
+    assert edge.bridge is True
+    assert edge.tunnel is True
     assert edge.average_gradient == 0.0
     assert edge.distance > 0.0
     assert edge.geometry == [
@@ -80,3 +84,5 @@ def test_unspecified_oneway_is_false(tmp_path):
     network = OSMReader(filepath).read()
 
     assert network.get_edge(3).oneway is False
+    assert network.get_edge(3).bridge is False
+    assert network.get_edge(3).tunnel is False

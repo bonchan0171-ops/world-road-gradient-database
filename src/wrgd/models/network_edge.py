@@ -43,3 +43,5 @@ class NetworkEdge:
     road_type: str
     oneway: bool
     geometry: list[Coordinate]
+    bridge: bool = False
+    tunnel: bool = False

@@ -112,6 +112,8 @@ class OSMReader:
                         road_type=road_type,
                         oneway=oneway,
                         geometry=geometry,
+                        bridge=tags.get("bridge") == "yes",
+                        tunnel=tags.get("tunnel") == "yes",
                     )
                 )
                 edge_id += 1
