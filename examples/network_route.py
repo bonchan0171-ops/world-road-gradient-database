@@ -77,7 +77,29 @@ def main() -> None:
         print(f"JSON: {args.json}")
 
     coordinates = network.path_coordinates(route)
-    GeoJSONWriter(args.output).write(coordinates)
+    GeoJSONWriter(args.output).write(
+        coordinates,
+        properties={
+            "node_ids": route.node_ids,
+            "edge_ids": route.edge_ids,
+            "distance_m": route.distance,
+            "edge_count": summary.edge_count,
+            "bridge_count": summary.bridge_count,
+            "tunnel_count": summary.tunnel_count,
+            "road_type_counts": summary.road_type_counts,
+            "ascent_m": statistics.ascent,
+            "descent_m": statistics.descent,
+            "highest_elevation_m": statistics.highest_elevation,
+            "lowest_elevation_m": statistics.lowest_elevation,
+            "max_gradient_pct": statistics.max_gradient,
+            "average_gradient_pct": statistics.average_gradient,
+            "average_curvature_per_m": statistics.average_curvature,
+            "max_curvature_per_m": statistics.max_curvature,
+            "min_radius_m": statistics.min_radius,
+            "average_radius_m": statistics.average_radius,
+            "sharp_curve_count": statistics.sharp_curve_count,
+        },
+    )
     print(f"Saved: {args.output}")
 
 

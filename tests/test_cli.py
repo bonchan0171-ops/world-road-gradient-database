@@ -101,7 +101,7 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
             average_curvature=0.01,
             max_curvature=0.02,
             min_radius=50.0,
-            average_radius=75.0,
+            average_radius=None,
             sharp_curve_count=2,
         ),
     )
@@ -155,6 +155,21 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
                     "node_ids": [100, 200],
                     "edge_ids": [10],
                     "distance_m": 123.0,
+                    "edge_count": 1,
+                    "bridge_count": 1,
+                    "tunnel_count": 0,
+                    "road_type_counts": {"primary": 1},
+                    "ascent_m": 10.0,
+                    "descent_m": 2.0,
+                    "highest_elevation_m": 110.0,
+                    "lowest_elevation_m": 100.0,
+                    "max_gradient_pct": 8.0,
+                    "average_gradient_pct": 4.0,
+                    "average_curvature_per_m": 0.01,
+                    "max_curvature_per_m": 0.02,
+                    "min_radius_m": 50.0,
+                    "average_radius_m": None,
+                    "sharp_curve_count": 2,
                 },
             )
 
@@ -181,6 +196,55 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
         "sharp_curve_count",
     ):
         assert field in output_text
+
+
+def test_cli_serializes_missing_average_radius_as_null(tmp_path: Path) -> None:
+    """Network Route GeoJSON should serialize a missing average radius as null."""
+    output = tmp_path / "route.geojson"
+    analysis = NetworkRouteAnalysis(
+        summary=NetworkPathSummary(
+            distance=123.0,
+            edge_count=1,
+            bridge_count=0,
+            tunnel_count=0,
+            road_type_counts={"residential": 1},
+        ),
+        statistics=RoadStatistics(
+            distance=123.0,
+            ascent=0.0,
+            descent=0.0,
+            highest_elevation=100.0,
+            lowest_elevation=100.0,
+            max_gradient=0.0,
+            average_gradient=0.0,
+            average_radius=None,
+        ),
+    )
+    with (
+        patch(
+            "sys.argv",
+            [
+                "wrgd",
+                "--network",
+                "tests/data/sample_network.osm",
+                "--dem",
+                "tests/data/sample_dem.tif",
+                "--start-node",
+                "1",
+                "--end-node",
+                "3",
+                "--output",
+                str(output),
+            ],
+        ),
+        patch("wrgd.cli.analyze_network_route", return_value=analysis),
+    ):
+        main()
+
+    properties = json.loads(output.read_text(encoding="utf-8"))["features"][0][
+        "properties"
+    ]
+    assert properties["average_radius_m"] is None
 
 
 @pytest.mark.parametrize(
