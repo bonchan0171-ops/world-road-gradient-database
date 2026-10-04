@@ -109,9 +109,7 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Load a GPX route and inspect elevations | `GPXReader`, `DEMLoader`, `RoadSegmentBuilder` | `examples.quickstart` or `wrgd --route ... --dem ...` |
 | Summarize distance, ascent, descent, and gradient | `RoadSegment.statistics()`, `calculate_statistics()` | `examples.python_api_example` or `wrgd --route ... --dem ...` |
 | Analyze sharp curves and curvature | `analyze_curvature()`, `CurvatureResult` | `examples.curvature_statistics` |
-| Find a route through a road network | `OSMReader`, `shortest_route()` | `examples.network_route` or `wrgd --network ...` |
-| Summarize road types, bridges, and tunnels on a network route | `wrgd.network.summarize_network_path()`, `NetworkPathSummary` | `examples.network_route` |
-| Analyze a DEM-backed network route with elevation, gradient, and curvature statistics | `wrgd.app.analyze_network_path()` | `RoadNetwork → NetworkPath → analyze_network_path() → RoadStatistics` |
+| Find a road-network route and analyze it with DEM elevation, gradient, curvature, and OSM road attributes | `shortest_route()`, `wrgd.app.analyze_network_route()`, `NetworkRouteAnalysis`, `NetworkPathSummary` | `examples.network_route` (`--json` optionally exports full analysis) |
 | Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
 | Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
@@ -132,12 +130,14 @@ are exposed as `True` in `NetworkEdge.bridge` and `NetworkEdge.tunnel`,
 respectively. Missing tags and other values are `False`. These boolean flags
 complement `road_type` (road classification) and `oneway` (travel direction).
 
-`shortest_route()` finds a `NetworkPath` only. To analyze that path with DEM
-elevations and the existing road statistics pipeline, use
-`wrgd.app.analyze_network_path()`:
+`shortest_route()` finds a `NetworkPath`. `wrgd.app.analyze_network_route()`
+combines its OSM road summary with DEM-backed statistics; the formal
+`examples.network_route` Example demonstrates this flow and exports GeoJSON,
+with optional full-analysis JSON via `--json`. Use
+`wrgd.app.analyze_network_path()` when only `RoadStatistics` is needed:
 
 ```text
-RoadNetwork → NetworkPath → analyze_network_path() → RoadStatistics
+RoadNetwork → NetworkPath → analyze_network_route() → NetworkRouteAnalysis
 ```
 
 ## Examples
@@ -149,10 +149,12 @@ the repository root after installing WRGD:
 python -m examples.quickstart
 python -m examples.curvature_statistics
 python -m examples.network_route \
-    --network roads.osm.xml \
-    --start-node 100 \
-    --end-node 200 \
-    --output output/route.geojson
+    --network tests/data/sample_network.osm \
+    --dem tests/data/sample_dem.tif \
+    --start-node 1 \
+    --end-node 3 \
+    --output output/network-route.geojson \
+    --json output/network-route-analysis.json
 python -m examples.python_api_example
 python -m examples.cli_export_example
 python -m examples.interactive_map
@@ -183,6 +185,7 @@ Input/output helpers for reading and writing GPX, GeoJSON, CSV, JSON, and GeoPac
 ```python
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
+from wrgd.io import write_network_route_json
 ```
 
 ### `wrgd.geometry`

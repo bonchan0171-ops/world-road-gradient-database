@@ -1,4 +1,4 @@
-"""Analyze and export a shortest OSM network route."""
+"""Find and analyze an OSM route, then export GeoJSON and optional JSON."""
 
 from __future__ import annotations
 
@@ -13,14 +13,43 @@ from wrgd.network import OSMReader
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse the OSM input, DEM, node IDs, and GeoJSON output path."""
+    """Parse required network analysis inputs and output paths."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--network", type=Path, required=True)
-    parser.add_argument("--dem", type=Path, required=True)
-    parser.add_argument("--start-node", type=int, required=True)
-    parser.add_argument("--end-node", type=int, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--json", type=Path, help="Optional full analysis JSON path")
+    parser.add_argument(
+        "--network",
+        type=Path,
+        required=True,
+        help="OSM XML road network file",
+    )
+    parser.add_argument(
+        "--dem",
+        type=Path,
+        required=True,
+        help="DEM GeoTIFF used for elevation and road statistics",
+    )
+    parser.add_argument(
+        "--start-node",
+        type=int,
+        required=True,
+        help="OSM node ID where the route starts",
+    )
+    parser.add_argument(
+        "--end-node",
+        type=int,
+        required=True,
+        help="OSM node ID where the route ends",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        required=True,
+        help="Output GeoJSON path",
+    )
+    parser.add_argument(
+        "--json",
+        type=Path,
+        help="Optional full-analysis JSON output path",
+    )
     return parser.parse_args()
 
 

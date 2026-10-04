@@ -15,6 +15,12 @@ This project follows Semantic Versioning.
   `bridge=yes` and `tunnel=yes` tags
 - `NetworkPathSummary` and `wrgd.network.summarize_network_path()` for network
   path distance and road-attribute summaries
+- `NetworkRouteAnalysis` and `wrgd.app.analyze_network_route()` to combine OSM
+  road summaries with DEM-backed road statistics
+- `wrgd.io.write_network_route_json()` to export complete Network Route
+  analysis results
+- Completed the Network Route Analysis Example documentation with fixture-based
+  inputs, required arguments, outputs, and optional full-analysis JSON usage
 
 ---
 
