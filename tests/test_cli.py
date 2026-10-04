@@ -1,5 +1,6 @@
 """Tests for WRGD CLI."""
 
+import json
 import unittest.mock as mock
 from pathlib import Path
 from unittest.mock import patch
@@ -9,6 +10,8 @@ import pytest
 from wrgd.cli import main
 from wrgd.models.coordinate import Coordinate
 from wrgd.models.network_path import NetworkPath
+from wrgd.models.network_path_summary import NetworkPathSummary
+from wrgd.models.network_route_analysis import NetworkRouteAnalysis
 from wrgd.models.road_statistics import RoadStatistics
 
 
@@ -79,6 +82,29 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
     output = Path("route.geojson")
     path = NetworkPath(node_ids=[100, 200], edge_ids=[10], distance=123.0)
     coordinates = [Coordinate(latitude=35.0, longitude=139.0)]
+    analysis = NetworkRouteAnalysis(
+        summary=NetworkPathSummary(
+            distance=123.0,
+            edge_count=1,
+            bridge_count=1,
+            tunnel_count=0,
+            road_type_counts={"primary": 1},
+        ),
+        statistics=RoadStatistics(
+            distance=123.0,
+            ascent=10.0,
+            descent=2.0,
+            highest_elevation=110.0,
+            lowest_elevation=100.0,
+            max_gradient=8.0,
+            average_gradient=4.0,
+            average_curvature=0.01,
+            max_curvature=0.02,
+            min_radius=50.0,
+            average_radius=75.0,
+            sharp_curve_count=2,
+        ),
+    )
 
     with patch(
         "sys.argv",
@@ -86,6 +112,8 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
             "wrgd",
             "--network",
             "roads.osm.xml",
+            "--dem",
+            "elevation.tif",
             "--start-node",
             "100",
             "--end-node",
@@ -97,6 +125,11 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
         with (
             patch("pathlib.Path.exists", return_value=True),
             patch("wrgd.cli.OSMReader") as mock_reader_class,
+            patch("wrgd.cli.DEMLoader") as mock_dem_class,
+            patch(
+                "wrgd.cli.analyze_network_route",
+                return_value=analysis,
+            ) as mock_analyze,
             patch("wrgd.cli.GeoJSONWriter") as mock_writer_class,
         ):
             mock_network = mock_reader_class.return_value.read.return_value
@@ -106,6 +139,14 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
             main()
 
             mock_network.shortest_route.assert_called_once_with(100, 200)
+            mock_network.apply_elevation.assert_called_once_with(
+                mock_dem_class.return_value
+            )
+            mock_analyze.assert_called_once_with(
+                mock_network,
+                path,
+                mock_dem_class.return_value,
+            )
             mock_network.path_coordinates.assert_called_once_with(path)
             mock_writer_class.assert_called_once_with(output)
             mock_writer_class.return_value.write.assert_called_once_with(
@@ -117,7 +158,29 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
                 },
             )
 
-    assert "WRGD Network Route" in capsys.readouterr().out
+    output_text = capsys.readouterr().out
+    assert "WRGD Network Route" in output_text
+    assert "Route summary" in output_text
+    assert "distance: 123.0 m" in output_text
+    assert "edge_count: 1" in output_text
+    assert "bridge_count: 1" in output_text
+    assert "tunnel_count: 0" in output_text
+    assert "road_type_counts: {'primary': 1}" in output_text
+    assert "Road statistics" in output_text
+    for field in (
+        "ascent",
+        "descent",
+        "highest_elevation",
+        "lowest_elevation",
+        "max_gradient",
+        "average_gradient",
+        "average_curvature",
+        "max_curvature",
+        "min_radius",
+        "average_radius",
+        "sharp_curve_count",
+    ):
+        assert field in output_text
 
 
 @pytest.mark.parametrize(
@@ -132,34 +195,15 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
             "--start-node and --end-node must be specified together",
         ),
         (
-            ["--start-node", "100", "--end-node", "200"],
+            [
+                "--start-node",
+                "100",
+                "--end-node",
+                "200",
+                "--dem",
+                "elevation.tif",
+            ],
             "--output is required for Network Route mode",
-        ),
-        (
-            [
-                "--start-node",
-                "100",
-                "--end-node",
-                "200",
-                "--output",
-                "route.geojson",
-                "--csv",
-                "route.csv",
-            ],
-            "--csv is not supported in Network Route mode",
-        ),
-        (
-            [
-                "--start-node",
-                "100",
-                "--end-node",
-                "200",
-                "--output",
-                "route.geojson",
-                "--json",
-                "route.json",
-            ],
-            "--json is not supported in Network Route mode",
         ),
     ],
 )
@@ -176,11 +220,10 @@ def test_cli_rejects_invalid_network_route_options(
     assert message in capsys.readouterr().out
 
 
-def test_cli_reports_unknown_network_route_node(
+def test_cli_requires_dem_for_network_route(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """CLI should report an unknown Network Route node."""
-
+    """CLI should require DEM for Network Route analysis."""
     with patch(
         "sys.argv",
         [
@@ -195,9 +238,79 @@ def test_cli_reports_unknown_network_route_node(
             "route.geojson",
         ],
     ):
+        main()
+
+    assert "Error: --dem is required for Network Route mode." in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    ("format_option", "filename"),
+    [("--csv", "network-route.csv"), ("--json", "network-route.json")],
+)
+def test_cli_writes_network_route_statistics(
+    tmp_path: Path,
+    format_option: str,
+    filename: str,
+) -> None:
+    """CLI should export Network Route RoadStatistics to CSV or JSON."""
+    statistics_output = tmp_path / filename
+    geojson_output = tmp_path / "network-route.geojson"
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            "tests/data/sample_network.osm",
+            "--dem",
+            "tests/data/sample_dem.tif",
+            "--start-node",
+            "1",
+            "--end-node",
+            "3",
+            "--output",
+            str(geojson_output),
+            format_option,
+            str(statistics_output),
+        ],
+    ):
+        main()
+
+    assert statistics_output.exists()
+    assert geojson_output.exists()
+    output_text = statistics_output.read_text(encoding="utf-8")
+    assert "distance" in output_text
+    if format_option == "--json":
+        data = json.loads(output_text)
+        assert data["distance"] > 0.0
+        assert "average_gradient" in data
+
+
+def test_cli_reports_unknown_network_route_node(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """CLI should report an unknown Network Route node."""
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            "roads.osm.xml",
+            "--dem",
+            "elevation.tif",
+            "--start-node",
+            "100",
+            "--end-node",
+            "200",
+            "--output",
+            "route.geojson",
+        ],
+    ):
         with (
             patch("pathlib.Path.exists", return_value=True),
             patch("wrgd.cli.OSMReader") as mock_reader_class,
+            patch("wrgd.cli.DEMLoader"),
         ):
             mock_network = mock_reader_class.return_value.read.return_value
             mock_network.shortest_route.side_effect = KeyError(100)
@@ -218,6 +331,8 @@ def test_cli_reports_unreachable_network_route(
             "wrgd",
             "--network",
             "roads.osm.xml",
+            "--dem",
+            "elevation.tif",
             "--start-node",
             "100",
             "--end-node",
@@ -229,6 +344,7 @@ def test_cli_reports_unreachable_network_route(
         with (
             patch("pathlib.Path.exists", return_value=True),
             patch("wrgd.cli.OSMReader") as mock_reader_class,
+            patch("wrgd.cli.DEMLoader"),
         ):
             mock_network = mock_reader_class.return_value.read.return_value
             mock_network.shortest_route.return_value = None

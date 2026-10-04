@@ -11,6 +11,7 @@ import rasterio.errors
 from wrgd.analysis.difficulty import calculate_difficulty
 from wrgd.analysis.score import calculate_score
 from wrgd.app import (
+    analyze_network_route,
     load_route,
     print_report,
     to_builder_coordinates,
@@ -58,7 +59,7 @@ def run_map(args) -> None:
 
 
 def run_network(args: argparse.Namespace) -> None:
-    """Load an OSM road network and optionally apply DEM elevations."""
+    """Load and analyze an OSM road network or route."""
     network_file = Path(args.network)
 
     has_start_node = args.start_node is not None
@@ -69,16 +70,12 @@ def run_network(args: argparse.Namespace) -> None:
         return
 
     route_mode = has_start_node and has_end_node
+    if route_mode and args.dem is None:
+        print("Error: --dem is required for Network Route mode.")
+        return
+
     if route_mode and args.output is None:
         print("Error: --output is required for Network Route mode.")
-        return
-
-    if route_mode and args.csv:
-        print("Error: --csv is not supported in Network Route mode.")
-        return
-
-    if route_mode and args.json:
-        print("Error: --json is not supported in Network Route mode.")
         return
 
     if not network_file.exists():
@@ -87,6 +84,7 @@ def run_network(args: argparse.Namespace) -> None:
 
     try:
         network = OSMReader(network_file).read()
+        dem_loader: DEMLoader | None = None
 
         if args.dem:
             dem_file = Path(args.dem)
@@ -106,6 +104,34 @@ def run_network(args: argparse.Namespace) -> None:
                 print("Error: no route found between the specified nodes.")
                 return
 
+            if dem_loader is None:
+                print("Error: --dem is required for Network Route mode.")
+                return
+
+            analysis = analyze_network_route(network, path, dem_loader)
+            summary = analysis.summary
+            statistics = analysis.statistics
+
+            if args.csv or args.json:
+                difficulty = calculate_difficulty(statistics)
+                score = calculate_score(statistics)
+
+                if args.csv:
+                    write_csv(
+                        statistics,
+                        Path(args.csv),
+                        difficulty=difficulty,
+                        score=score,
+                    )
+
+                if args.json:
+                    write_json(
+                        statistics,
+                        Path(args.json),
+                        difficulty=difficulty,
+                        score=score,
+                    )
+
             coordinates = network.path_coordinates(path)
             GeoJSONWriter(Path(args.output)).write(
                 coordinates,
@@ -119,6 +145,25 @@ def run_network(args: argparse.Namespace) -> None:
             print(f"Network: {network_file}")
             print(f"Start  : {args.start_node}")
             print(f"End    : {args.end_node}")
+            print("Route summary")
+            print(f"distance: {summary.distance:.1f} m")
+            print(f"edge_count: {summary.edge_count}")
+            print(f"bridge_count: {summary.bridge_count}")
+            print(f"tunnel_count: {summary.tunnel_count}")
+            print(f"road_type_counts: {summary.road_type_counts}")
+            print("Road statistics")
+            print(f"distance: {statistics.distance:.1f} m")
+            print(f"ascent: {statistics.ascent:.1f} m")
+            print(f"descent: {statistics.descent:.1f} m")
+            print(f"highest_elevation: {statistics.highest_elevation:.1f} m")
+            print(f"lowest_elevation: {statistics.lowest_elevation:.1f} m")
+            print(f"max_gradient: {statistics.max_gradient:.2f} %")
+            print(f"average_gradient: {statistics.average_gradient:.2f} %")
+            print(f"average_curvature: {statistics.average_curvature:.6f}")
+            print(f"max_curvature: {statistics.max_curvature:.6f}")
+            print(f"min_radius: {statistics.min_radius:.1f} m")
+            print(f"average_radius: {statistics.average_radius}")
+            print(f"sharp_curve_count: {statistics.sharp_curve_count}")
             print(f"Output : {args.output}")
             return
 
@@ -197,7 +242,7 @@ def main() -> None:
 
     analyze.add_argument(
         "--dem",
-        help="DEM file (.tif), required with --route",
+        help="DEM file (.tif), required with --route and Network Route mode",
     )
 
     analyze.add_argument(
@@ -212,7 +257,10 @@ def main() -> None:
 
     analyze.add_argument(
         "--output",
-        help="Optional output PNG path for the elevation profile image",
+        help=(
+            "PNG output for --route or required GeoJSON output for "
+            "Network Route mode"
+        ),
     )
 
     analyze.add_argument(
