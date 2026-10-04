@@ -16,6 +16,7 @@ from wrgd.app import (
     print_report,
     to_builder_coordinates,
 )
+from wrgd.io import write_network_route_json
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
@@ -125,8 +126,8 @@ def run_network(args: argparse.Namespace) -> None:
                     )
 
                 if args.json:
-                    write_json(
-                        statistics,
+                    write_network_route_json(
+                        analysis,
                         Path(args.json),
                         difficulty=difficulty,
                         score=score,

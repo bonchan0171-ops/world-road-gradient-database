@@ -282,8 +282,11 @@ def test_cli_writes_network_route_statistics(
     assert "distance" in output_text
     if format_option == "--json":
         data = json.loads(output_text)
-        assert data["distance"] > 0.0
-        assert "average_gradient" in data
+        assert data["summary"]["distance"] > 0.0
+        assert data["summary"]["edge_count"] == 2
+        assert data["statistics"]["distance"] > 0.0
+        assert "average_gradient" in data["statistics"]
+        assert "score" in data["statistics"]
 
 
 def test_cli_reports_unknown_network_route_node(

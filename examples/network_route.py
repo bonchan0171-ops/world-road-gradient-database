@@ -6,6 +6,7 @@ import argparse
 from pathlib import Path
 
 from wrgd.app import analyze_network_route
+from wrgd.io import write_network_route_json
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.network import OSMReader
@@ -19,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--start-node", type=int, required=True)
     parser.add_argument("--end-node", type=int, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--json", type=Path, help="Optional full analysis JSON path")
     return parser.parse_args()
 
 
@@ -69,6 +71,10 @@ def main() -> None:
     )
     print(f"Radius: minimum {statistics.min_radius:.1f} m, average {average_radius}")
     print(f"Sharp curves: {statistics.sharp_curve_count}")
+
+    if args.json:
+        write_network_route_json(analysis, args.json)
+        print(f"JSON: {args.json}")
 
     coordinates = network.path_coordinates(route)
     GeoJSONWriter(args.output).write(coordinates)
