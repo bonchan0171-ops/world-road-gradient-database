@@ -130,7 +130,7 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
                 "wrgd.cli.analyze_network_route",
                 return_value=analysis,
             ) as mock_analyze,
-            patch("wrgd.cli.GeoJSONWriter") as mock_writer_class,
+            patch("wrgd.cli.write_network_route_geojson") as mock_geojson_writer,
         ):
             mock_network = mock_reader_class.return_value.read.return_value
             mock_network.shortest_route.return_value = path
@@ -147,30 +147,11 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
                 path,
                 mock_dem_class.return_value,
             )
-            mock_network.path_coordinates.assert_called_once_with(path)
-            mock_writer_class.assert_called_once_with(output)
-            mock_writer_class.return_value.write.assert_called_once_with(
-                coordinates,
-                properties={
-                    "node_ids": [100, 200],
-                    "edge_ids": [10],
-                    "distance_m": 123.0,
-                    "edge_count": 1,
-                    "bridge_count": 1,
-                    "tunnel_count": 0,
-                    "road_type_counts": {"primary": 1},
-                    "ascent_m": 10.0,
-                    "descent_m": 2.0,
-                    "highest_elevation_m": 110.0,
-                    "lowest_elevation_m": 100.0,
-                    "max_gradient_pct": 8.0,
-                    "average_gradient_pct": 4.0,
-                    "average_curvature_per_m": 0.01,
-                    "max_curvature_per_m": 0.02,
-                    "min_radius_m": 50.0,
-                    "average_radius_m": None,
-                    "sharp_curve_count": 2,
-                },
+            mock_geojson_writer.assert_called_once_with(
+                mock_network,
+                path,
+                analysis,
+                output,
             )
 
     output_text = capsys.readouterr().out

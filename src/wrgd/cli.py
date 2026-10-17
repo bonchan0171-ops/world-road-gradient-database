@@ -16,7 +16,7 @@ from wrgd.app import (
     print_report,
     to_builder_coordinates,
 )
-from wrgd.io import write_network_route_json
+from wrgd.io import write_network_route_geojson, write_network_route_json
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
@@ -133,29 +133,11 @@ def run_network(args: argparse.Namespace) -> None:
                         score=score,
                     )
 
-            coordinates = network.path_coordinates(path)
-            GeoJSONWriter(Path(args.output)).write(
-                coordinates,
-                properties={
-                    "node_ids": path.node_ids,
-                    "edge_ids": path.edge_ids,
-                    "distance_m": path.distance,
-                    "edge_count": summary.edge_count,
-                    "bridge_count": summary.bridge_count,
-                    "tunnel_count": summary.tunnel_count,
-                    "road_type_counts": summary.road_type_counts,
-                    "ascent_m": statistics.ascent,
-                    "descent_m": statistics.descent,
-                    "highest_elevation_m": statistics.highest_elevation,
-                    "lowest_elevation_m": statistics.lowest_elevation,
-                    "max_gradient_pct": statistics.max_gradient,
-                    "average_gradient_pct": statistics.average_gradient,
-                    "average_curvature_per_m": statistics.average_curvature,
-                    "max_curvature_per_m": statistics.max_curvature,
-                    "min_radius_m": statistics.min_radius,
-                    "average_radius_m": statistics.average_radius,
-                    "sharp_curve_count": statistics.sharp_curve_count,
-                },
+            write_network_route_geojson(
+                network,
+                path,
+                analysis,
+                Path(args.output),
             )
             print("WRGD Network Route")
             print(f"Network: {network_file}")
