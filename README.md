@@ -140,6 +140,62 @@ with optional full-analysis JSON via `--json`. Use
 RoadNetwork → NetworkPath → analyze_network_route() → NetworkRouteAnalysis
 ```
 
+## Network Route Analysis 出力仕様
+
+`examples.network_route` はネットワーク・DEM・開始Node・終了Node・GeoJSON出力先を必須引数として受け取り、`--json` は任意です。CLIのNetwork Route modeでは、同じGeoJSON出力に加えて `--json` と `--csv` を指定できます。
+
+### Full Analysis JSON
+
+`write_network_route_json()` は次の構造で出力します。
+
+| オブジェクト | フィールド |
+|---|---|
+| `summary` | `distance`, `edge_count`, `bridge_count`, `tunnel_count`, `road_type_counts` |
+| `statistics` | `distance`, `ascent`, `descent`, `highest_elevation`, `lowest_elevation`, `max_gradient`, `average_gradient`, `average_curvature`, `max_curvature`, `min_radius`, `average_radius`, `sharp_curve_count` |
+
+`difficulty`（`level` と `name` を含むオブジェクト）と `score` は、Writerの呼び出し元から渡された場合に `statistics` 内へ追加されます。
+
+### Network Route GeoJSON
+
+`write_network_route_geojson()` は1つのGeoJSON `Feature` として経路を出力します。座標はGeoJSONの規則に従い `[longitude, latitude]` の順です。Feature propertiesは次のとおりです。
+
+| Property | 意味・単位 |
+|---|---|
+| `node_ids` | 経路上のNode ID（通過順） |
+| `edge_ids` | 経路上のEdge ID（通過順） |
+| `distance_m` | `NetworkPath`の距離、m |
+| `edge_count` | 経路のEdge数 |
+| `bridge_count` | 橋として記録されたEdge数 |
+| `tunnel_count` | トンネルとして記録されたEdge数 |
+| `road_type_counts` | 道路種別ごとのEdge数 |
+| `ascent_m` | 累積上昇量、m |
+| `descent_m` | 累積下降量、m |
+| `highest_elevation_m` | 最高標高、m |
+| `lowest_elevation_m` | 最低標高、m |
+| `max_gradient_pct` | 最大勾配、% |
+| `average_gradient_pct` | 平均勾配、% |
+| `average_curvature_per_m` | 平均曲率、1/m |
+| `max_curvature_per_m` | 最大曲率、1/m |
+| `min_radius_m` | 最小曲率半径、m |
+| `average_radius_m` | 平均曲率半径、m |
+| `sharp_curve_count` | 急カーブ数 |
+
+### 距離の由来
+
+3つの距離フィールドは由来が異なります。
+
+| 出力 | 距離の由来 |
+|---|---|
+| JSON `summary.distance` | 経路Edgeの距離合計 |
+| JSON `statistics.distance` | DEM解析で生成した`RoadSegment`に基づく距離 |
+| GeoJSON `distance_m` | `NetworkPath.distance` |
+
+このため、3つの値が常に完全一致するとは限りません。
+
+### 欠損値とCSV
+
+`average_radius` / `average_radius_m` の値が `None` の場合、JSON / GeoJSONでは `null` になります。Network Route modeのCSVは既存のRoadStatistics用形式で、列は `distance`, `ascent`, `descent`, `highest_elevation`, `lowest_elevation`, `max_gradient`, `average_gradient`, `difficulty_level`, `difficulty_name`, `score` です。`NetworkPathSummary`全体は含みません。既存の汎用JSON / CSV Writerの仕様は変更しません。
+
 ## Examples
 
 The official Examples are the following seven scripts. Run these commands from
@@ -408,14 +464,17 @@ The options are:
 - `--output`: optional PNG image output path
 - `--gpkg`: optional GeoPackage output path for road segments
 
-For a Network Route GeoJSON export, provide the network, start node, end node,
-and output path:
+For a Network Route export, provide the network, DEM, start node, end node,
+and GeoJSON output path. JSON and CSV outputs are optional:
 
 ```bash
-wrgd --network roads.osm.xml \
-    --start-node 100 \
-    --end-node 200 \
-    --output route.geojson
+wrgd --network tests/data/sample_network.osm \
+    --dem tests/data/sample_dem.tif \
+    --start-node 1 \
+    --end-node 3 \
+    --output output/network-route.geojson \
+    --json output/network-route-analysis.json \
+    --csv output/network-route-statistics.csv
 ```
 
 Network Route mode converts `NetworkPath` through

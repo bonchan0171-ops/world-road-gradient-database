@@ -21,6 +21,8 @@ This project follows Semantic Versioning.
   analysis results
 - Completed the Network Route Analysis Example documentation with fixture-based
   inputs, required arguments, outputs, and optional full-analysis JSON usage
+- Documented Network Route Analysis JSON, GeoJSON, and CSV output fields,
+  distance sources, and missing-radius serialization
 
 ---
 

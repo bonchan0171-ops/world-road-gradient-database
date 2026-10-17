@@ -45,8 +45,11 @@ python -m examples.network_route \
 出力:
 
 - ターミナルに経路summaryと `RoadStatistics`（標高・勾配・曲率統計）を表示
-- GeoJSONに経路座標と分析propertiesを出力
-- `--json` 指定時はsummaryとstatisticsを含むFull Analysis JSONを出力
+- `--output`: 経路座標と分析propertiesを持つGeoJSON
+- `--json`: 指定時にsummaryとstatisticsを含むFull Analysis JSON
+- Network Route CLIの `--csv`: RoadStatistics用CSV。経路summaryは含みません（Example自体に `--csv` 引数はありません）
+
+Full Analysis JSONとGeoJSON propertiesのフィールド、および距離の由来は、[READMEのNetwork Route Analysis出力仕様](../README.md#network-route-analysis-出力仕様)を参照してください。
 
 経路summaryから `bridge_count`、`tunnel_count`、`road_type_counts` を取得できます。
 OSMの橋・トンネル属性は対応するWay tagに基づきます。
