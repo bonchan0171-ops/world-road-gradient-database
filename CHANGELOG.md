@@ -23,6 +23,7 @@ This project follows Semantic Versioning.
   inputs, required arguments, outputs, and optional full-analysis JSON usage
 - Documented Network Route Analysis JSON, GeoJSON, and CSV output fields,
   distance sources, and missing-radius serialization
+- Added optional bridge, tunnel, and road-type filters to Network Route search
 
 ---
 

@@ -118,6 +118,11 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
             "100",
             "--end-node",
             "200",
+            "--avoid-bridges",
+            "--avoid-tunnels",
+            "--road-types",
+            "primary",
+            "residential",
             "--output",
             str(output),
         ],
@@ -138,7 +143,13 @@ def test_cli_exports_network_route_geojson(capsys: pytest.CaptureFixture[str]) -
 
             main()
 
-            mock_network.shortest_route.assert_called_once_with(100, 200)
+            mock_network.shortest_route.assert_called_once_with(
+                100,
+                200,
+                avoid_bridges=True,
+                avoid_tunnels=True,
+                allowed_road_types=["primary", "residential"],
+            )
             mock_network.apply_elevation.assert_called_once_with(
                 mock_dem_class.return_value
             )
@@ -286,6 +297,53 @@ def test_cli_requires_dem_for_network_route(
         main()
 
     assert "Error: --dem is required for Network Route mode." in capsys.readouterr().out
+
+
+@pytest.mark.parametrize(
+    ("arguments", "message"),
+    [
+        (
+            ["--route", "sample.gpx", "--dem", "sample.tif", "--avoid-bridges"],
+            "Network Route filters cannot be used with --route.",
+        ),
+        (
+            ["--network", "roads.osm.xml", "--avoid-tunnels"],
+            "Network Route filters require --start-node and --end-node.",
+        ),
+    ],
+)
+def test_cli_rejects_route_filters_outside_network_route_mode(
+    arguments: list[str],
+    message: str,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """CLI should reject route filters outside Network Route mode."""
+    with patch("sys.argv", ["wrgd", *arguments]):
+        main()
+
+    assert message in capsys.readouterr().out
+
+
+def test_cli_rejects_unsupported_road_type() -> None:
+    """CLI should validate road types against OSMReader support."""
+    with (
+        patch(
+            "sys.argv",
+            [
+                "wrgd",
+                "--network",
+                "roads.osm.xml",
+                "--start-node",
+                "1",
+                "--end-node",
+                "2",
+                "--road-types",
+                "unsupported",
+            ],
+        ),
+        pytest.raises(SystemExit),
+    ):
+        main()
 
 
 @pytest.mark.parametrize(

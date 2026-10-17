@@ -110,6 +110,8 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Summarize distance, ascent, descent, and gradient | `RoadSegment.statistics()`, `calculate_statistics()` | `examples.python_api_example` or `wrgd --route ... --dem ...` |
 | Analyze sharp curves and curvature | `analyze_curvature()`, `CurvatureResult` | `examples.curvature_statistics` |
 | Find a road-network route and analyze it with DEM elevation, gradient, curvature, and OSM road attributes | `shortest_route()`, `wrgd.app.analyze_network_route()`, `NetworkRouteAnalysis`, `NetworkPathSummary` | `examples.network_route` (`--json` optionally exports full analysis) |
+| Find routes while avoiding bridges or tunnels | `RoadNetwork.shortest_route(avoid_bridges=..., avoid_tunnels=...)` | Network Route CLI / `examples.network_route` |
+| Limit route search to selected road types | `RoadNetwork.shortest_route(allowed_road_types=...)` | Network Route CLI / `examples.network_route` |
 | Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
 | Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
@@ -136,6 +138,34 @@ For the complete list of Examples and their input requirements, see
 - **Python API:** `OSMReader`でOSMデータを`RoadNetwork`に読み込み、`RoadNetwork.shortest_route()`で経路を求めます。読み込んだ`DEMLoader`と合わせてnetwork、path、DEM Loaderを`wrgd.app.analyze_network_route()`に渡すと、`NetworkRouteAnalysis`が返ります。
 
 `NetworkRouteAnalysis.summary`は経路の道路属性サマリー、`NetworkRouteAnalysis.statistics`はDEM解析に基づく道路統計です。出力フィールドと距離の違いは[Network Route Analysis 出力仕様](#network-route-analysis-出力仕様)を参照してください。通常のルートを扱うPython API例は[Minimal Python API Example](#minimal-python-api-example)と`examples.python_api_example`にあります。
+
+#### 道路属性フィルター
+
+`RoadNetwork.shortest_route()`では、橋・トンネルの回避と道路種別の許可リストを指定できます。複数の条件はANDで適用され、条件を満たす経路がなければPython APIは`None`を返し、CLIは経路なしのメッセージを表示します。
+
+`OSMReader`では、OSM Wayの`bridge`または`tunnel`タグ値が`yes`の場合に限り、対応するEdge属性を`True`にします。道路種別は`motorway`, `trunk`, `primary`, `secondary`, `tertiary`, `residential`, `unclassified`, `service`から指定できます。
+
+Python API:
+
+```python
+from wrgd.network import OSMReader
+
+network = OSMReader("roads.osm").read()
+path = network.shortest_route(
+    100,
+    200,
+    avoid_bridges=True,
+    allowed_road_types={"primary", "secondary"},
+)
+```
+
+CLI:
+
+```bash
+wrgd --network roads.osm --dem elevation.tif \
+    --start-node 100 --end-node 200 --output route.geojson \
+    --avoid-bridges --road-types primary secondary
+```
 
 `wrgd.network.summarize_network_path(network, path)` returns a
 `NetworkPathSummary` with the total distance from the path's edges, edge count,

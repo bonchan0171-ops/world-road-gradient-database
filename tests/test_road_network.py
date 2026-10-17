@@ -126,6 +126,9 @@ def add_network_edge(
     distance: float,
     oneway: bool = False,
     geometry: list[Coordinate] | None = None,
+    road_type: str = "residential",
+    bridge: bool = False,
+    tunnel: bool = False,
 ) -> None:
     """Add a test edge to a network."""
     network.add_edge(
@@ -135,9 +138,11 @@ def add_network_edge(
             end_node=end_node,
             distance=distance,
             average_gradient=0.0,
-            road_type="residential",
+            road_type=road_type,
             oneway=oneway,
             geometry=geometry or [],
+            bridge=bridge,
+            tunnel=tunnel,
         )
     )
 
@@ -148,6 +153,24 @@ def create_path_network(node_count: int) -> tuple[RoadNetwork, list[NetworkNode]
     nodes = [NetworkNode(index, 35.0, 139.0, None) for index in range(node_count)]
     for node in nodes:
         network.add_node(node)
+    return network, nodes
+
+
+def create_filtered_route_network() -> tuple[RoadNetwork, list[NetworkNode]]:
+    """Create short bridge, medium tunnel, and long unrestricted routes."""
+    network, nodes = create_path_network(6)
+    add_network_edge(
+        network, 10, nodes[0], nodes[1], 1.0, road_type="primary", bridge=True
+    )
+    add_network_edge(network, 11, nodes[1], nodes[5], 1.0, road_type="primary")
+    add_network_edge(
+        network, 20, nodes[0], nodes[2], 2.0, road_type="residential", tunnel=True
+    )
+    add_network_edge(
+        network, 21, nodes[2], nodes[5], 2.0, road_type="residential", tunnel=True
+    )
+    add_network_edge(network, 30, nodes[0], nodes[3], 3.0, road_type="tertiary")
+    add_network_edge(network, 31, nodes[3], nodes[5], 3.0, road_type="tertiary")
     return network, nodes
 
 
@@ -276,6 +299,72 @@ def test_shortest_route_selects_matching_shortest_edges() -> None:
     assert route.distance == 7.0
 
 
+def test_shortest_route_avoids_bridges() -> None:
+    """橋を避け、次に短い非橋経路を選ぶ。"""
+    network, _ = create_filtered_route_network()
+
+    route = network.shortest_route(0, 5, avoid_bridges=True)
+
+    assert route is not None
+    assert route.node_ids == [0, 2, 5]
+    assert route.distance == 4.0
+
+
+def test_shortest_route_avoids_tunnels() -> None:
+    """トンネルを避け、トンネルのない最短経路を選ぶ。"""
+    network, _ = create_filtered_route_network()
+
+    route = network.shortest_route(0, 5, avoid_tunnels=True)
+
+    assert route is not None
+    assert route.node_ids == [0, 1, 5]
+    assert route.distance == 2.0
+
+
+def test_shortest_route_limits_allowed_road_types() -> None:
+    """許可された道路種別だけで経路を探索する。"""
+    network, _ = create_filtered_route_network()
+
+    route = network.shortest_route(0, 5, allowed_road_types={"tertiary"})
+
+    assert route is not None
+    assert route.node_ids == [0, 3, 5]
+    assert route.distance == 6.0
+
+
+def test_shortest_route_combines_filters_with_and() -> None:
+    """橋・トンネル回避と道路種別をAND条件で適用する。"""
+    network, _ = create_filtered_route_network()
+
+    route = network.shortest_route(
+        0,
+        5,
+        avoid_bridges=True,
+        avoid_tunnels=True,
+        allowed_road_types={"tertiary"},
+    )
+
+    assert route is not None
+    assert route.node_ids == [0, 3, 5]
+    assert route.distance == 6.0
+
+
+def test_shortest_route_returns_none_when_filters_block_all_routes() -> None:
+    """条件に一致するEdgeがなければNoneを返す。"""
+    network, _ = create_filtered_route_network()
+
+    assert (
+        network.shortest_route(
+            0,
+            5,
+            avoid_bridges=True,
+            allowed_road_types={"primary"},
+        )
+        is None
+    )
+    assert network.shortest_route(0, 5, allowed_road_types=set()) is None
+
+
 def test_shortest_route_respects_oneway_edges() -> None:
     """NetworkPathもoneway Edgeの方向制約を尊重する。"""
     network, nodes = create_path_network(2)
@@ -287,6 +376,7 @@ def test_shortest_route_respects_oneway_edges() -> None:
     assert route.node_ids == [0, 1]
     assert route.edge_ids == [10]
     assert network.shortest_route(1, 0) is None
+    assert network.shortest_route(1, 0, allowed_road_types={"residential"}) is None
 
 
 def test_shortest_route_returns_none_when_unreachable() -> None:
@@ -306,6 +396,15 @@ def test_shortest_route_returns_empty_edges_for_same_node() -> None:
     assert route.node_ids == [0]
     assert route.edge_ids == []
     assert route.distance == 0.0
+
+    filtered_route = network.shortest_route(
+        0,
+        0,
+        avoid_bridges=True,
+        avoid_tunnels=True,
+        allowed_road_types=set(),
+    )
+    assert filtered_route == route
 
 
 def test_shortest_route_raises_key_error_for_unknown_node() -> None:

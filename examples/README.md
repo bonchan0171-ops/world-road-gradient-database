@@ -48,6 +48,7 @@ python -m examples.network_route \
 - `--output`: 経路座標と分析propertiesを持つGeoJSON
 - `--json`: 指定時にsummaryとstatisticsを含むFull Analysis JSON
 - Network Route CLIの `--csv`: RoadStatistics用CSV。経路summaryは含みません（Example自体に `--csv` 引数はありません）
+- 探索条件: `--avoid-bridges`、`--avoid-tunnels`、複数指定可能な `--road-types TYPE [TYPE ...]`
 
 Full Analysis JSONとGeoJSON propertiesのフィールド、および距離の由来は、[READMEのNetwork Route Analysis出力仕様](../README.md#network-route-analysis-出力仕様)を参照してください。
 

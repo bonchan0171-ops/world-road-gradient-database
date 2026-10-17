@@ -5,6 +5,7 @@ This module defines the RoadNetwork container used in WRGD road analysis.
 """
 
 import heapq
+from collections.abc import Collection
 from dataclasses import dataclass, field
 
 from ..io.dem_loader import DEMLoader
@@ -130,6 +131,10 @@ class RoadNetwork:
         self,
         start_node_id: int,
         end_node_id: int,
+        *,
+        avoid_bridges: bool = False,
+        avoid_tunnels: bool = False,
+        allowed_road_types: Collection[str] | None = None,
     ) -> NetworkPath | None:
         """
         Find the shortest route with node and edge details.
@@ -140,6 +145,12 @@ class RoadNetwork:
             Identifier of the starting node.
         end_node_id : int
             Identifier of the destination node.
+        avoid_bridges : bool
+            Exclude edges marked as bridges when true.
+        avoid_tunnels : bool
+            Exclude edges marked as tunnels when true.
+        allowed_road_types : Collection[str] | None
+            Road types that may be used, or all types when ``None``.
 
         Returns
         -------
@@ -181,6 +192,16 @@ class RoadNetwork:
                 )
 
             for edge in self._outgoing_network_edges(current_node_id):
+                if (
+                    (avoid_bridges and edge.bridge)
+                    or (avoid_tunnels and edge.tunnel)
+                    or (
+                        allowed_road_types is not None
+                        and edge.road_type not in allowed_road_types
+                    )
+                ):
+                    continue
+
                 if edge.distance < 0:
                     continue
 

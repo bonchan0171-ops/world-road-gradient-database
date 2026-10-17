@@ -39,6 +39,23 @@ def parse_args() -> argparse.Namespace:
         help="OSM node ID where the route ends",
     )
     parser.add_argument(
+        "--avoid-bridges",
+        action="store_true",
+        help="Exclude bridge edges from the route",
+    )
+    parser.add_argument(
+        "--avoid-tunnels",
+        action="store_true",
+        help="Exclude tunnel edges from the route",
+    )
+    parser.add_argument(
+        "--road-types",
+        nargs="+",
+        choices=sorted(OSMReader.SUPPORTED_HIGHWAYS),
+        metavar="TYPE",
+        help="Restrict the route to these OSM highway types",
+    )
+    parser.add_argument(
         "--output",
         type=Path,
         required=True,
@@ -56,7 +73,13 @@ def main() -> None:
     """Analyze and export one shortest route from an OSM network."""
     args = parse_args()
     network = OSMReader(args.network).read()
-    route = network.shortest_route(args.start_node, args.end_node)
+    route = network.shortest_route(
+        args.start_node,
+        args.end_node,
+        avoid_bridges=args.avoid_bridges,
+        avoid_tunnels=args.avoid_tunnels,
+        allowed_road_types=args.road_types,
+    )
 
     if route is None:
         raise ValueError("No route was found between the specified nodes.")

@@ -27,6 +27,8 @@ from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.visualization.leaflet import export_leaflet_map
 
+SUPPORTED_ROAD_TYPES = sorted(OSMReader.SUPPORTED_HIGHWAYS)
+
 
 def run_map(args) -> None:
     output_path = Path(args.output)
@@ -71,6 +73,13 @@ def run_network(args: argparse.Namespace) -> None:
         return
 
     route_mode = has_start_node and has_end_node
+    has_route_filters = (
+        args.avoid_bridges or args.avoid_tunnels or args.road_types is not None
+    )
+    if not route_mode and has_route_filters:
+        print("Error: Network Route filters require --start-node and --end-node.")
+        return
+
     if route_mode and args.dem is None:
         print("Error: --dem is required for Network Route mode.")
         return
@@ -100,7 +109,13 @@ def run_network(args: argparse.Namespace) -> None:
             network.apply_elevation()
 
         if route_mode:
-            path = network.shortest_route(args.start_node, args.end_node)
+            path = network.shortest_route(
+                args.start_node,
+                args.end_node,
+                avoid_bridges=args.avoid_bridges,
+                avoid_tunnels=args.avoid_tunnels,
+                allowed_road_types=args.road_types,
+            )
             if path is None:
                 print("Error: no route found between the specified nodes.")
                 return
@@ -239,6 +254,26 @@ def main() -> None:
     )
 
     analyze.add_argument(
+        "--avoid-bridges",
+        action="store_true",
+        help="Exclude bridge edges from Network Route mode",
+    )
+
+    analyze.add_argument(
+        "--avoid-tunnels",
+        action="store_true",
+        help="Exclude tunnel edges from Network Route mode",
+    )
+
+    analyze.add_argument(
+        "--road-types",
+        nargs="+",
+        choices=SUPPORTED_ROAD_TYPES,
+        metavar="TYPE",
+        help="Restrict Network Route mode to these OSM highway types",
+    )
+
+    analyze.add_argument(
         "--dem",
         help="DEM file (.tif), required with --route and Network Route mode",
     )
@@ -294,6 +329,12 @@ def main() -> None:
 
     if args.command == "map":
         run_map(args)
+        return
+
+    if args.route and (
+        args.avoid_bridges or args.avoid_tunnels or args.road_types is not None
+    ):
+        print("Error: Network Route filters cannot be used with --route.")
         return
 
     if args.network:
