@@ -119,6 +119,24 @@ Use this table to find the WRGD feature that matches what you want to do.
 For the complete list of Examples and their input requirements, see
 [`examples/README.md`](examples/README.md).
 
+## CLIとPython APIの使い分け
+
+| 利用目的 | 適した入口 |
+|---|---|
+| ターミナルから道路解析を実行する | CLI |
+| CSV / JSON / GeoJSONなどのファイルを出力する | CLI |
+| Pythonコードを書かず、既存機能を使う | CLI |
+| 解析結果をPythonプログラム内で再利用する | Python API |
+| 独自の後処理・可視化を行う | Python API |
+| 複数処理を組み合わせてワークフローを作る | Python API |
+
+### Network Route Analysis
+
+- **CLI:** `wrgd analyze`でNetwork RouteをDEM解析し、結果をターミナルに表示します。GeoJSONは必須出力で、Full Analysis JSONとRoadStatistics用CSVは任意で出力できます。実行例は[CLI Usage Example](#cli-usage-example)を参照してください。
+- **Python API:** `OSMReader`でOSMデータを`RoadNetwork`に読み込み、`RoadNetwork.shortest_route()`で経路を求めます。読み込んだ`DEMLoader`と合わせてnetwork、path、DEM Loaderを`wrgd.app.analyze_network_route()`に渡すと、`NetworkRouteAnalysis`が返ります。
+
+`NetworkRouteAnalysis.summary`は経路の道路属性サマリー、`NetworkRouteAnalysis.statistics`はDEM解析に基づく道路統計です。出力フィールドと距離の違いは[Network Route Analysis 出力仕様](#network-route-analysis-出力仕様)を参照してください。通常のルートを扱うPython API例は[Minimal Python API Example](#minimal-python-api-example)と`examples.python_api_example`にあります。
+
 `wrgd.network.summarize_network_path(network, path)` returns a
 `NetworkPathSummary` with the total distance from the path's edges, edge count,
 bridge and tunnel counts, and counts by `road_type`. This Module API is separate
