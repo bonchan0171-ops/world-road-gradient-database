@@ -12,6 +12,7 @@ from wrgd.models.coordinate import Coordinate
 from wrgd.models.network_path import NetworkPath
 from wrgd.models.network_path_summary import NetworkPathSummary
 from wrgd.models.network_route_analysis import NetworkRouteAnalysis
+from wrgd.models.road_network_summary import RoadNetworkSummary
 from wrgd.models.road_statistics import RoadStatistics
 
 
@@ -51,6 +52,71 @@ def test_cli_reads_network(capsys: pytest.CaptureFixture[str]) -> None:
     output = capsys.readouterr().out
     assert "Nodes: 12" in output
     assert "Edges: 20" in output
+    assert "Road Network Summary" in output
+    assert "node_count: 12" in output
+    assert "edge_count: 20" in output
+
+
+def test_cli_writes_network_summary_json(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Network-only mode should print and export the whole-network summary."""
+    output = tmp_path / "network-summary.json"
+    summary = RoadNetworkSummary(
+        node_count=12,
+        edge_count=20,
+        total_distance=1234.5,
+        road_type_counts={"primary": 12, "residential": 8},
+        road_type_distances={"primary": 900.0, "residential": 334.5},
+        bridge_edge_count=2,
+        tunnel_edge_count=1,
+        oneway_edge_count=5,
+    )
+
+    with (
+        patch("sys.argv", ["wrgd", "--network", "roads.osm", "--json", str(output)]),
+        patch("pathlib.Path.exists", return_value=True),
+        patch("wrgd.cli.OSMReader") as mock_reader_class,
+        patch("wrgd.cli.summarize_road_network", return_value=summary),
+    ):
+        mock_network = mock_reader_class.return_value.read.return_value
+        mock_network.node_count.return_value = 12
+        mock_network.edge_count.return_value = 20
+
+        main()
+
+    output_text = capsys.readouterr().out
+    assert "total_distance: 1234.5 m" in output_text
+    assert "road_type_counts: {'primary': 12, 'residential': 8}" in output_text
+    assert "bridge_edge_count: 2" in output_text
+    assert "tunnel_edge_count: 1" in output_text
+    assert "oneway_edge_count: 5" in output_text
+    assert json.loads(output.read_text(encoding="utf-8")) == {
+        "node_count": 12,
+        "edge_count": 20,
+        "total_distance_m": 1234.5,
+        "road_type_counts": {"primary": 12, "residential": 8},
+        "road_type_distances_m": {"primary": 900.0, "residential": 334.5},
+        "bridge_edge_count": 2,
+        "tunnel_edge_count": 1,
+        "oneway_edge_count": 5,
+    }
+
+
+def test_cli_rejects_csv_for_network_only_mode(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Network-only mode should explain that the RoadStatistics CSV is invalid."""
+    with patch(
+        "sys.argv",
+        ["wrgd", "--network", "roads.osm", "--csv", "network-summary.csv"],
+    ):
+        main()
+
+    assert (
+        "Error: --csv is not available in Network-only mode." in capsys.readouterr().out
+    )
 
 
 def test_cli_reads_network_with_dem() -> None:

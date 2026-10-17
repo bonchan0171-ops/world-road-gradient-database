@@ -16,13 +16,17 @@ from wrgd.app import (
     print_report,
     to_builder_coordinates,
 )
-from wrgd.io import write_network_route_geojson, write_network_route_json
+from wrgd.io import (
+    write_network_route_geojson,
+    write_network_route_json,
+    write_road_network_summary_json,
+)
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.io.json_writer import write_json
-from wrgd.network import OSMReader
+from wrgd.network import OSMReader, summarize_road_network
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.visualization.leaflet import export_leaflet_map
@@ -78,6 +82,9 @@ def run_network(args: argparse.Namespace) -> None:
     )
     if not route_mode and has_route_filters:
         print("Error: Network Route filters require --start-node and --end-node.")
+        return
+    if not route_mode and args.csv:
+        print("Error: --csv is not available in Network-only mode.")
         return
 
     if route_mode and args.dem is None:
@@ -184,6 +191,20 @@ def run_network(args: argparse.Namespace) -> None:
         print(f"Network: {network_file}")
         print(f"Nodes: {network.node_count()}")
         print(f"Edges: {network.edge_count()}")
+        summary = summarize_road_network(network)
+        print("Road Network Summary")
+        print(f"node_count: {summary.node_count}")
+        print(f"edge_count: {summary.edge_count}")
+        print(f"total_distance: {summary.total_distance:.1f} m")
+        print(f"road_type_counts: {summary.road_type_counts}")
+        print(f"road_type_distances: {summary.road_type_distances}")
+        print(f"bridge_edge_count: {summary.bridge_edge_count}")
+        print(f"tunnel_edge_count: {summary.tunnel_edge_count}")
+        print(f"oneway_edge_count: {summary.oneway_edge_count}")
+        if args.json:
+            output_path = Path(args.json)
+            write_road_network_summary_json(summary, output_path)
+            print(f"JSON: {output_path}")
     except (
         KeyError,
         ValueError,
@@ -285,7 +306,10 @@ def main() -> None:
 
     analyze.add_argument(
         "--json",
-        help="Optional output JSON path for road statistics",
+        help=(
+            "Optional JSON output path for RoadStatistics (--route), "
+            "Network Summary (network-only), or Full Analysis (Network Route)"
+        ),
     )
 
     analyze.add_argument(

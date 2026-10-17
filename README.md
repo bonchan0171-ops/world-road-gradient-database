@@ -112,6 +112,7 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Find a road-network route and analyze it with DEM elevation, gradient, curvature, and OSM road attributes | `shortest_route()`, `wrgd.app.analyze_network_route()`, `NetworkRouteAnalysis`, `NetworkPathSummary` | `examples.network_route` (`--json` optionally exports full analysis) |
 | Find routes while avoiding bridges or tunnels | `RoadNetwork.shortest_route(avoid_bridges=..., avoid_tunnels=...)` | Network Route CLI / `examples.network_route` |
 | Limit route search to selected road types | `RoadNetwork.shortest_route(allowed_road_types=...)` | Network Route CLI / `examples.network_route` |
+| Summarize a complete road network | `wrgd.network.summarize_road_network()` | `wrgd analyze --network ... [--json ...]` |
 | Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
 | Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
@@ -165,6 +166,27 @@ CLI:
 wrgd --network roads.osm --dem elevation.tif \
     --start-node 100 --end-node 200 --output route.geojson \
     --avoid-bridges --road-types primary secondary
+```
+
+#### 道路ネットワーク全体のSummary
+
+`wrgd.network.summarize_road_network(network)`はDEMを必要とせず、Network内の全`NetworkEdge`を単位として集計します。道路種別ごとの件数と距離は`road_type_counts`と`road_type_distances`に、橋・トンネル・一方通行の件数は`bridge_edge_count`・`tunnel_edge_count`・`oneway_edge_count`に含まれます。総距離の単位はmです。
+
+```python
+from pathlib import Path
+
+from wrgd.io import write_road_network_summary_json
+from wrgd.network import OSMReader, summarize_road_network
+
+network = OSMReader("roads.osm").read()
+summary = summarize_road_network(network)
+write_road_network_summary_json(summary, Path("road-network-summary.json"))
+```
+
+CLIのNetwork-only modeでも同じSummaryを表示し、`--json`で保存できます。Network-only modeの`--csv`はRoadStatistics用のため利用できません。
+
+```bash
+wrgd analyze --network roads.osm --json road-network-summary.json
 ```
 
 `wrgd.network.summarize_network_path(network, path)` returns a

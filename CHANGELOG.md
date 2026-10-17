@@ -24,6 +24,7 @@ This project follows Semantic Versioning.
 - Documented Network Route Analysis JSON, GeoJSON, and CSV output fields,
   distance sources, and missing-radius serialization
 - Added optional bridge, tunnel, and road-type filters to Network Route search
+- Added whole-network road attribute summaries and JSON export
 
 ---
 
