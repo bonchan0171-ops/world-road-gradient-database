@@ -30,6 +30,22 @@ wrgd analyze --network tests/data/sample_network.osm \
 GeoJSONはEdge単位のLineString Featureとして出力されます。GeoJSONだけを作成する場合は
 `--json`を省略できます。
 
+## Road Network Topology
+
+物理的なTopologyは、全Edgeを向きなしの接続として分析します。`oneway`は無視され、
+重複Edgeは各々Degreeに数えます。Degree 0は孤立ノード、Degree 1は行き止まり、
+Degree 3以上はグラフ上の交差点候補です。交差点候補は幾何的な道路交差を検出しません。
+Connected Componentsは無向接続で計算され、登録済みの孤立ノードも単独Componentになります。
+
+```bash
+wrgd analyze --network tests/data/sample_network.osm \
+	--topology-json output/road-network-topology.json
+```
+
+`--topology-json`はNetwork-only mode専用です。`--json`の道路属性Summary JSONや
+`--output`の全Edge GeoJSONと併用できます。OSMReaderは対応道路Wayに使われるノードのみを
+Networkへ登録するため、対応道路に接続しないOSMノードは分析対象に含まれません。
+
 `network_route.py` は、OSM道路ネットワークから最短経路を求め、DEMを使って
 標高・勾配・曲率を分析する正式Exampleです。外部データを取得せず、同梱fixtureで実行できます。
 

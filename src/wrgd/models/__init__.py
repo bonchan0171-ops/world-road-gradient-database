@@ -9,6 +9,7 @@ from .network_node import NetworkNode
 from .network_path import NetworkPath
 from .network_route_analysis import NetworkRouteAnalysis
 from .road_network_summary import RoadNetworkSummary
+from .road_network_topology_summary import RoadNetworkTopologySummary
 from .road_statistics import RoadStatistics
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "NetworkPath",
     "NetworkRouteAnalysis",
     "RoadNetworkSummary",
+    "RoadNetworkTopologySummary",
     "RoadStatistics",
 ]

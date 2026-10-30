@@ -27,6 +27,11 @@ This project follows Semantic Versioning.
 - Added whole-network road attribute summaries and JSON export
 - Added `wrgd.io.write_road_network_geojson()` and Network-only CLI export of
   every road edge as an individual LineString Feature, alongside summary JSON
+- Added `RoadNetworkTopologySummary` and
+  `wrgd.network.analyze_network_topology()` for physical degrees, node
+  classifications, and undirected connected components
+- Added `wrgd.io.write_road_network_topology_json()` and the Network-only
+  `--topology-json` CLI option
 
 ---
 

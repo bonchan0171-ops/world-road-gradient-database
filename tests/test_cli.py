@@ -151,6 +151,122 @@ def test_cli_writes_network_geojson_and_summary_json(
     assert summary_data["edge_count"] == len(geojson_data["features"])
 
 
+def test_cli_writes_network_topology_json_only(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    network_file = Path(__file__).parent / "data" / "sample_network.osm"
+    topology_output = tmp_path / "topology.json"
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            str(network_file),
+            "--topology-json",
+            str(topology_output),
+        ],
+    ):
+        main()
+
+    topology_data = json.loads(topology_output.read_text(encoding="utf-8"))
+    assert topology_data["node_count"] == 3
+    assert topology_data["edge_count"] == 2
+    assert topology_data["component_count"] == 1
+    assert topology_data["dead_end_node_ids"] == [1, 3]
+    output = capsys.readouterr().out
+    assert "component_count: 1" in output
+    assert "isolated_node_count: 0" in output
+    assert "dead_end_node_count: 2" in output
+    assert "intersection_candidate_count: 0" in output
+
+
+def test_cli_combines_network_topology_with_json_and_geojson(
+    tmp_path: Path,
+) -> None:
+    network_file = Path(__file__).parent / "data" / "sample_network.osm"
+    summary_output = tmp_path / "summary.json"
+    geojson_output = tmp_path / "network.geojson"
+    topology_output = tmp_path / "topology.json"
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            str(network_file),
+            "--json",
+            str(summary_output),
+            "--output",
+            str(geojson_output),
+            "--topology-json",
+            str(topology_output),
+        ],
+    ):
+        main()
+
+    summary_data = json.loads(summary_output.read_text(encoding="utf-8"))
+    geojson_data = json.loads(geojson_output.read_text(encoding="utf-8"))
+    topology_data = json.loads(topology_output.read_text(encoding="utf-8"))
+    assert summary_data["edge_count"] == 2
+    assert len(geojson_data["features"]) == 2
+    assert topology_data["edge_count"] == 2
+    assert topology_data["connected_components"] == [[1, 2, 3]]
+
+
+def test_cli_rejects_topology_json_in_network_route_mode(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            "roads.osm",
+            "--start-node",
+            "1",
+            "--end-node",
+            "2",
+            "--topology-json",
+            "topology.json",
+        ],
+    ):
+        main()
+
+    assert (
+        "Error: --topology-json is only available in Network-only mode."
+        in capsys.readouterr().out
+    )
+
+
+def test_cli_rejects_topology_json_without_network(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    with (
+        patch(
+            "sys.argv",
+            [
+                "wrgd",
+                "--route",
+                "sample.gpx",
+                "--dem",
+                "sample.tif",
+                "--topology-json",
+                "topology.json",
+            ],
+        ),
+        patch("wrgd.cli.load_route") as mock_load_route,
+    ):
+        main()
+
+    assert (
+        "Error: --topology-json requires --network in Network-only mode."
+        in capsys.readouterr().out
+    )
+    mock_load_route.assert_not_called()
+
+
 def test_cli_rejects_csv_for_network_only_mode(
     capsys: pytest.CaptureFixture[str],
 ) -> None:

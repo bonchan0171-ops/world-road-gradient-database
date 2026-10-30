@@ -21,13 +21,18 @@ from wrgd.io import (
     write_network_route_json,
     write_road_network_geojson,
     write_road_network_summary_json,
+    write_road_network_topology_json,
 )
 from wrgd.io.csv_writer import write_csv
 from wrgd.io.dem_loader import DEMLoader
 from wrgd.io.geojson_writer import GeoJSONWriter
 from wrgd.io.gpkg_writer import GeoPackageWriter
 from wrgd.io.json_writer import write_json
-from wrgd.network import OSMReader, summarize_road_network
+from wrgd.network import (
+    OSMReader,
+    analyze_network_topology,
+    summarize_road_network,
+)
 from wrgd.profile import ElevationProfile
 from wrgd.road.builder import RoadSegmentBuilder
 from wrgd.visualization.leaflet import export_leaflet_map
@@ -78,6 +83,10 @@ def run_network(args: argparse.Namespace) -> None:
         return
 
     route_mode = has_start_node and has_end_node
+    if route_mode and args.topology_json:
+        print("Error: --topology-json is only available in Network-only mode.")
+        return
+
     has_route_filters = (
         args.avoid_bridges or args.avoid_tunnels or args.road_types is not None
     )
@@ -210,6 +219,19 @@ def run_network(args: argparse.Namespace) -> None:
             output_path = Path(args.json)
             write_road_network_summary_json(summary, output_path)
             print(f"JSON: {output_path}")
+        if args.topology_json:
+            topology_summary = analyze_network_topology(network)
+            output_path = Path(args.topology_json)
+            write_road_network_topology_json(topology_summary, output_path)
+            print("Road Network Topology")
+            print(f"component_count: {topology_summary.component_count}")
+            print(f"isolated_node_count: {len(topology_summary.isolated_node_ids)}")
+            print(f"dead_end_node_count: {len(topology_summary.dead_end_node_ids)}")
+            print(
+                "intersection_candidate_count: "
+                f"{len(topology_summary.intersection_node_ids)}"
+            )
+            print(f"Topology JSON: {output_path}")
     except (
         KeyError,
         ValueError,
@@ -318,6 +340,14 @@ def main() -> None:
     )
 
     analyze.add_argument(
+        "--topology-json",
+        help=(
+            "Optional output JSON path for physical topology analysis "
+            "(--network only)"
+        ),
+    )
+
+    analyze.add_argument(
         "--output",
         help=(
             "PNG output for --route or GeoJSON output for --network "
@@ -358,6 +388,10 @@ def main() -> None:
 
     if args.command == "map":
         run_map(args)
+        return
+
+    if args.topology_json and not args.network:
+        print("Error: --topology-json requires --network in Network-only mode.")
         return
 
     if args.route and (

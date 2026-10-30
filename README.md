@@ -114,6 +114,7 @@ Use this table to find the WRGD feature that matches what you want to do.
 | Find routes while avoiding bridges or tunnels | `RoadNetwork.shortest_route(avoid_bridges=..., avoid_tunnels=...)` | Network Route CLI / `examples.network_route` |
 | Limit route search to selected road types | `RoadNetwork.shortest_route(allowed_road_types=...)` | Network Route CLI / `examples.network_route` |
 | Summarize a complete road network | `wrgd.network.summarize_road_network()` | `wrgd analyze --network ... [--json ...]` |
+| Analyze physical road-network topology | `wrgd.network.analyze_network_topology()` | `wrgd analyze --network ... --topology-json ...` |
 | Identify roads that include bridges or tunnels | `NetworkEdge.bridge`, `NetworkEdge.tunnel` (alongside `road_type` and `oneway`) | `OSMReader`; `examples.network_route` for the network-route workflow |
 | Export analyzed road segments as GeoJSON | `GeoJSONWriter.write_segments()` | `examples.segment_geojson` or `wrgd ... --interactive ...` |
 | Export road analysis as GeoPackage | `GeoPackageWriter` | `wrgd ... --gpkg ...` |
@@ -190,6 +191,38 @@ CLIのNetwork-only modeでも同じSummaryを表示し、`--json`で集計JSON�
 wrgd analyze --network roads.osm \
     --json road-network-summary.json \
     --output road-network.geojson
+```
+
+#### 道路ネットワークTopology分析
+
+`wrgd.network.analyze_network_topology(network)`は、`network.nodes`に登録されているノードと全Edgeを使って、物理的な道路接続構造を分析します。一方通行は無視して全Edgeを無向接続として扱います。Node DegreeはEdge接続数で、自己ループは2、同じノード間の重複Edgeはそれぞれ数えます。
+
+- `isolated_node_ids`: Degree 0のノード
+- `dead_end_node_ids`: Degree 1のノード
+- `intersection_node_ids`: Degree 3以上のノード。グラフ上の交差点候補であり、地理的な道路交差を幾何的に検出するものではありません。
+- `connected_components`: 一方通行を無視した無向グラフの連結成分。登録済みの孤立ノードも単独Componentになります。
+
+OSMReaderは対応する道路Wayに使われるノードだけを`RoadNetwork`に登録します。そのため、対応道路に接続しないOSMノードはこのTopology分析には現れません。
+
+Python API:
+
+```python
+from wrgd.network import OSMReader, analyze_network_topology
+
+network = OSMReader("roads.osm").read()
+topology = analyze_network_topology(network)
+print(topology.component_count)
+print(topology.intersection_node_ids)
+```
+
+Network-only CLIではTopology JSONを出力できます。`--json`（道路属性Summary）、`--output`（全Edge GeoJSON）とも併用できます。
+
+```bash
+wrgd analyze --network roads.osm --topology-json road-network-topology.json
+wrgd analyze --network roads.osm \
+    --json road-network-summary.json \
+    --output road-network.geojson \
+    --topology-json road-network-topology.json
 ```
 
 `wrgd.network.summarize_network_path(network, path)` returns a
