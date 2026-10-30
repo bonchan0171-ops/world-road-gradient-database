@@ -18,12 +18,17 @@
 
 ## Network Route Analysis Example
 
-ネットワーク全体のSummaryはCLIのNetwork-only modeで表示でき、`--json`でJSON保存できます:
+ネットワーク全体のSummaryはCLIのNetwork-only modeで表示でき、`--json`で集計JSON、
+`--output`で全EdgeのGeoJSONを保存できます。2つの出力は併用できます:
 
 ```bash
 wrgd analyze --network tests/data/sample_network.osm \
-	--json output/road-network-summary.json
+    --json output/road-network-summary.json \
+    --output output/road-network.geojson
 ```
+
+GeoJSONはEdge単位のLineString Featureとして出力されます。GeoJSONだけを作成する場合は
+`--json`を省略できます。
 
 `network_route.py` は、OSM道路ネットワークから最短経路を求め、DEMを使って
 標高・勾配・曲率を分析する正式Exampleです。外部データを取得せず、同梱fixtureで実行できます。

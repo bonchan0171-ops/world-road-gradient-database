@@ -19,6 +19,7 @@ from wrgd.app import (
 from wrgd.io import (
     write_network_route_geojson,
     write_network_route_json,
+    write_road_network_geojson,
     write_road_network_summary_json,
 )
 from wrgd.io.csv_writer import write_csv
@@ -201,6 +202,10 @@ def run_network(args: argparse.Namespace) -> None:
         print(f"bridge_edge_count: {summary.bridge_edge_count}")
         print(f"tunnel_edge_count: {summary.tunnel_edge_count}")
         print(f"oneway_edge_count: {summary.oneway_edge_count}")
+        if args.output:
+            output_path = Path(args.output)
+            write_road_network_geojson(network, output_path)
+            print(f"GeoJSON: {output_path}")
         if args.json:
             output_path = Path(args.json)
             write_road_network_summary_json(summary, output_path)
@@ -315,8 +320,8 @@ def main() -> None:
     analyze.add_argument(
         "--output",
         help=(
-            "PNG output for --route or required GeoJSON output for "
-            "Network Route mode"
+            "PNG output for --route or GeoJSON output for --network "
+            "(required in Network Route mode)"
         ),
     )
 

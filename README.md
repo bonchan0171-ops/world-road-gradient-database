@@ -42,6 +42,7 @@ WRGD currently supports:
 - `RoadNetwork.path_coordinates()` for continuous route coordinates
 - Network Route GeoJSON CLI with `--start-node` and `--end-node`
 - Network Route mode uses `--output` for GeoJSON output
+- Network-only mode exports every road edge to GeoJSON with `--output`
 ---
 
 ## Installation
@@ -183,10 +184,12 @@ summary = summarize_road_network(network)
 write_road_network_summary_json(summary, Path("road-network-summary.json"))
 ```
 
-CLIのNetwork-only modeでも同じSummaryを表示し、`--json`で保存できます。Network-only modeの`--csv`はRoadStatistics用のため利用できません。
+CLIのNetwork-only modeでも同じSummaryを表示し、`--json`で集計JSONを保存できます。`--output`を指定すると、全NetworkEdgeをEdge単位のLineString FeatureとしてGeoJSONに保存します。`--json`と`--output`は併用できます。Network-only modeの`--csv`はRoadStatistics用のため利用できません。
 
 ```bash
-wrgd analyze --network roads.osm --json road-network-summary.json
+wrgd analyze --network roads.osm \
+    --json road-network-summary.json \
+    --output road-network.geojson
 ```
 
 `wrgd.network.summarize_network_path(network, path)` returns a

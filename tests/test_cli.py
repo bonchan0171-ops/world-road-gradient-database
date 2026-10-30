@@ -104,6 +104,53 @@ def test_cli_writes_network_summary_json(
     }
 
 
+def test_cli_writes_network_geojson_only(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    network_file = Path(__file__).parent / "data" / "sample_network.osm"
+    output = tmp_path / "network.geojson"
+
+    with patch(
+        "sys.argv",
+        ["wrgd", "--network", str(network_file), "--output", str(output)],
+    ):
+        main()
+
+    data = json.loads(output.read_text(encoding="utf-8"))
+    assert data["type"] == "FeatureCollection"
+    assert data["features"]
+    assert f"GeoJSON: {output}" in capsys.readouterr().out
+
+
+def test_cli_writes_network_geojson_and_summary_json(
+    tmp_path: Path,
+) -> None:
+    network_file = Path(__file__).parent / "data" / "sample_network.osm"
+    geojson_output = tmp_path / "network.geojson"
+    json_output = tmp_path / "network-summary.json"
+
+    with patch(
+        "sys.argv",
+        [
+            "wrgd",
+            "--network",
+            str(network_file),
+            "--output",
+            str(geojson_output),
+            "--json",
+            str(json_output),
+        ],
+    ):
+        main()
+
+    geojson_data = json.loads(geojson_output.read_text(encoding="utf-8"))
+    summary_data = json.loads(json_output.read_text(encoding="utf-8"))
+    assert geojson_data["type"] == "FeatureCollection"
+    assert geojson_data["features"]
+    assert summary_data["edge_count"] == len(geojson_data["features"])
+
+
 def test_cli_rejects_csv_for_network_only_mode(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
