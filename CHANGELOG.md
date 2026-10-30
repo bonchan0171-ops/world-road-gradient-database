@@ -32,6 +32,8 @@ This project follows Semantic Versioning.
   classifications, and undirected connected components
 - Added `wrgd.io.write_road_network_topology_json()` and the Network-only
   `--topology-json` CLI option
+- Added Python 3.12 and 3.14 CI matrix coverage
+- Added Dependabot weekly version update monitoring for pip and GitHub Actions
 
 ---
 
